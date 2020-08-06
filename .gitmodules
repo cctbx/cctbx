@@ -1,0 +1,33 @@
+[submodule "cctbx_project"]
+	path = cctbx_project
+	url = https://github.com/cctbx/cctbx_project.git
+[submodule "tntbx"]
+	path = tntbx
+	url = https://github.com/cctbx/tntbx.git
+[submodule "annlib"]
+	path = annlib
+	url = https://github.com/cctbx/annlib.git
+[submodule "annlib_adaptbx"]
+	path = annlib_adaptbx
+	url = https://github.com/cctbx/annlib_adaptbx.git
+[submodule "boost"]
+	path = boost
+	url = https://github.com/cctbx/boost.git
+[submodule "ccp4io"]
+	path = ccp4io
+	url = https://github.com/cctbx/ccp4io.git
+[submodule "ccp4io_adaptbx"]
+	path = ccp4io_adaptbx
+	url = https://github.com/cctbx/ccp4io_adaptbx.git
+[submodule "clipper"]
+	path = clipper
+	url = https://github.com/cctbx/clipper.git
+[submodule "eigen"]
+	path = eigen
+	url = https://github.com/cctbx/eigen.git
+[submodule "gui_resources"]
+	path = gui_resources
+	url = https://github.com/cctbx/gui_resources.git
+[submodule "scons"]
+	path = scons
+	url = https://github.com/scons/scons.git
