@@ -31,3 +31,9 @@
 [submodule "scons"]
 	path = modules/scons
 	url = https://github.com/scons/scons.git
+[submodule "modules/cbflib"]
+	path = modules/cbflib
+	url = https://github.com/yayahjb/cbflib.git
+[submodule "modules/dxtbx"]
+	path = modules/dxtbx
+	url = https://github.com/cctbx/dxtbx.git
