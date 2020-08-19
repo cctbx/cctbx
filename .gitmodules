@@ -24,7 +24,7 @@
 	url = https://github.com/cctbx/clipper.git
 [submodule "eigen"]
 	path = modules/eigen
-	url = https://github.com/cctbx/eigen.git
+        url = https://gitlab.com/libeigen/eigen.git 
 [submodule "gui_resources"]
 	path = modules/gui_resources
 	url = https://github.com/cctbx/gui_resources.git
