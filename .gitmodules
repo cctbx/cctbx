@@ -36,4 +36,4 @@
 	url = https://github.com/yayahjb/cbflib.git
 [submodule "modules/dxtbx"]
 	path = modules/dxtbx
-	url = https://github.com/cctbx/dxtbx.git
+	url = https://github.com/dials/dxtbx.git
