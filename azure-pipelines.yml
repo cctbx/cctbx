@@ -1,0 +1,113 @@
+# Build cctbx source tarball
+
+jobs:
+- job: Build_cctbx_source_tarball
+  pool:
+    vmImage: ubuntu-latest
+  timeoutInMinutes: 120
+
+  # variables for version
+  variables:
+    year: $(Get-Date -Format yyyy)
+    month: $(Get-Date -Format MM)
+    day: $(Get-Date -Format dd)
+    version: $(year).$(month).a$(day)
+
+  steps:
+
+  # ubuntu setup
+  - script: |
+      sudo apt-get install -y build-essential curl git libgl1-mesa-dev libglu1-mesa-dev locales subversion
+      sudo locale-gen en_US.UTF-8
+      sudo update-locale
+    displayName: Install dependencies for Ubuntu
+
+  # set version
+  - powershell: |
+      Write-Host "##vso[task.setVariable variable=year]$(year)"
+      Write-Host "##vso[task.setVariable variable=month]$(month)"
+      Write-Host "##vso[task.setVariable variable=day]$(day)"
+      Write-Host $(year)
+      Write-Host $(month)
+      Write-Host $(day)
+    displayName: Set variables from date
+
+  - script: |
+      version=$(year).$(month).a$(day)
+      echo "##vso[task.setVariable variable=version]$version"
+      echo $(version)
+    displayName: Set version
+
+  # download sources
+  - checkout: self
+    submodules: recursive
+
+  # add conda to path
+  # https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/anaconda?view=azure-devops&tabs=ubuntu-16-04#add-conda-to-your-system-path
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  # link bootstrap.py
+  - script: |
+      set -x -e
+      ln -s modules/cctbx_project/libtbx/auto_build/bootstrap.py
+    displayName: Link bootstrap.py
+
+  # base and build
+  - script: |
+      set -x -e
+      python bootstrap.py base build --builder=cctbx --use-conda --python 38 --nproc=4
+      cd build
+      source setpaths.sh
+      libtbx.configure cma_es fable rstbx spotfinder cbflib_adaptbx phenix_regression phenix_examples
+      libtbx.scons -j 4
+      libtbx.scons -j 4
+    displayName: Configure and Build
+
+  - script: |
+      set -x -e
+      conda install -p conda_base -y -c conda-forge --no-deps --freeze-installed junit-xml
+    displayName: Install junit-xml
+
+  # test
+  - script: |
+      set -x -e
+      source ./build/setpaths.sh
+      mkdir tests
+      cd tests
+      export PYTHONDEVMODE=1
+      export PYTHONTRACEMALLOC=3
+      libtbx.run_tests_parallel \
+        module=annlib_adaptbx \
+        module=boost_adaptbx \
+        module=cbflib_adaptbx \
+        module=cctbx \
+        module=cctbx_website \
+        module=cma_es \
+        module=fable \
+        module=gltbx \
+        module=iotbx \
+        module=libtbx \
+        module=rstbx \
+        module=scitbx \
+        module=smtbx \
+        module=spotfinder \
+        nproc=4
+    failOnStderr: false
+    displayName: Test
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: './tests/output.xml'
+
+  # build source tarball
+  - script: |
+      build/bin/libtbx.create_installer --version $(version) --install_script modules/cctbx_project/libtbx/auto_build/plus_installer.py --dist_dir dist/$(version) tmp/cctbx-$(version)
+    displayName: Build source tarball
+
+  # publish source tarball as artifact
+  - publish: ./dist/$(version)/cctbx-$(version).tar.gz
+    artifact: cctbx-$(version)
+    continueOnError: true
