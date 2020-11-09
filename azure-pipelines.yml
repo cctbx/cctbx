@@ -39,11 +39,11 @@ jobs:
     displayName: Set version
 
   - script: |
-      version=`echo $(Build.SourceBranchName) | sed 's/releases\///'`
+      version=`echo $(Build.SourceBranch) | sed 's/refs\/heads\/releases\///'`
       echo "##vso[task.setVariable variable=version]$version"
       echo $(version)
     displayName: Override version for release branch
-    condition: startswith(variables['Build.SourceBranchName'], 'releases/')
+    condition: startswith(variables['Build.SourceBranch'], 'refs/heads/releases/')
 
   # download sources
   - checkout: self
