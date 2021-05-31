@@ -15,7 +15,7 @@ steps:
 
   - script: |
       set -xe
-      conda activate test
+      source activate test
       cd $(Pipeline.Workspace)
       mkdir tests
       cd tests
