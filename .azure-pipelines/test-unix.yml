@@ -13,6 +13,7 @@ steps:
       conda create -n test -c conda-forge -y cctbx-base python=$(PY_VER) junit-xml
     displayName: Construct latest conda environment
 
+  # module=cbflib_adaptbx
   - script: |
       set -xe
       source activate test
@@ -24,7 +25,6 @@ steps:
       libtbx.run_tests_parallel \
         module=annlib_adaptbx \
         module=boost_adaptbx \
-        module=cbflib_adaptbx \
         module=cctbx \
         module=cctbx_website \
         module=cma_es \
