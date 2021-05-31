@@ -1,0 +1,43 @@
+steps:
+  # add conda to path
+  # https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/anaconda?view=azure-devops&tabs=ubuntu-16-04#add-conda-to-your-system-path
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - script: |
+      set -xe
+      conda create -n test -c conda-forge cctbx-base python=$(PY_VER) junit-xml
+    displayName: Construct latest conda environment
+
+  - script: |
+      set -xe
+      conda activate test
+      cd $(Pipeline.Workspace)
+      mkdir tests
+      cd tests
+      export PYTHONDEVMODE=1
+      export PYTHONTRACEMALLOC=1
+      libtbx.run_tests_parallel \
+        module=annlib_adaptbx \
+        module=boost_adaptbx \
+        module=cbflib_adaptbx \
+        module=cctbx \
+        module=cctbx_website \
+        module=cma_es \
+        module=fable \
+        module=gltbx \
+        module=iotbx \
+        module=libtbx \
+        module=rstbx \
+        module=scitbx \
+        module=smtbx \
+        module=spotfinder \
+        nproc=4
+    failOnStderr: false
+    displayName: Run subset of tests
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '$(Pipeline.Workspace)/tests/output.xml'

@@ -1,0 +1,14 @@
+# Nightly tests of conda-forge package
+
+# no continuous integration builds or pull requests
+trigger: none
+pr: none
+
+schedules:
+  - cron: '0 1 * * *'
+    displayName: Nightly conda-forge tests
+
+jobs:
+  - template: ./conda-forge-linux.yml
+  - template: ./conda-forge-osx.yml
+  # - template: ./conda-forge-win.yml
