@@ -14,4 +14,4 @@ schedules:
 jobs:
   - template: ./conda-forge-linux.yml
   - template: ./conda-forge-osx.yml
-  # - template: ./conda-forge-win.yml
+  - template: ./conda-forge-win.yml
