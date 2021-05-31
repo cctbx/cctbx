@@ -1,5 +1,5 @@
 jobs:
-  - job: linux-64
+  - job: linux_64
     pool:
       vmImage: ubuntu-latest
     timeoutInMinutes: 120

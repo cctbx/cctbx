@@ -1,5 +1,5 @@
 jobs:
-  - job: osx-64
+  - job: osx_64
     pool:
       vmImage: macOS-latest
     timeoutInMinutes: 120
