@@ -14,6 +14,7 @@ steps:
     displayName: Construct latest conda environment
 
   # module=cbflib_adaptbx
+  # module=fable
   - script: |
       set -xe
       source activate test
@@ -28,7 +29,6 @@ steps:
         module=cctbx \
         module=cctbx_website \
         module=cma_es \
-        module=fable \
         module=gltbx \
         module=iotbx \
         module=libtbx \

@@ -25,25 +25,25 @@ jobs:
         displayName: Construct latest conda environment
 
       # module=cbflib_adaptbx
+      # module=fable
       - script: |
           call activate test
           cd $(Pipeline.Workspace)
           mkdir tests
           cd tests
-          call libtbx.run_tests_parallel \
-            module=annlib_adaptbx \
-            module=boost_adaptbx \
-            module=cctbx \
-            module=cctbx_website \
-            module=cma_es \
-            module=fable \
-            module=gltbx \
-            module=iotbx \
-            module=libtbx \
-            module=rstbx \
-            module=scitbx \
-            module=smtbx \
-            module=spotfinder \
+          call libtbx.run_tests_parallel ^
+            module=annlib_adaptbx ^
+            module=boost_adaptbx ^
+            module=cctbx ^
+            module=cctbx_website ^
+            module=cma_es ^
+            module=gltbx ^
+            module=iotbx ^
+            module=libtbx ^
+            module=rstbx ^
+            module=scitbx ^
+            module=smtbx ^
+            module=spotfinder ^
             nproc=4
         failOnStderr: false
         displayName: Run subset of tests
