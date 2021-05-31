@@ -4,14 +4,18 @@ steps:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
+  # https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/anaconda?view=azure-devops&tabs=macos
+  - bash: sudo chown -R $USER $CONDA
+    displayName: Take ownership of conda installation
+
   - script: |
       set -xe
-      conda create -p ./test -c conda-forge -y cctbx-base python=$(PY_VER) junit-xml
+      conda create -n test -c conda-forge -y cctbx-base python=$(PY_VER) junit-xml
     displayName: Construct latest conda environment
 
   - script: |
       set -xe
-      conda activate ./test
+      conda activate test
       cd $(Pipeline.Workspace)
       mkdir tests
       cd tests
