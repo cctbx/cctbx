@@ -1,38 +1,55 @@
-steps:
-  # add conda to path
-  - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
-    displayName: Add conda to PATH
+jobs:
+  - job: win_64
+    pool:
+      vmImage: windows-latest
+    timeoutInMinutes: 120
+    strategy:
+      maxParallel: 2
+      matrix:
+        python3.6:
+          PY_VER: 3.6
+        python3.7:
+          PY_VER: 3.7
+        python3.8:
+          PY_VER: 3.8
+        python3.9:
+          PY_VER: 3.9
 
-  - script: |
-      conda create -n test -c conda-forge -y cctbx-base python=$(PY_VER) junit-xml
-    displayName: Construct latest conda environment
+    steps:
+      # add conda to path
+      - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+        displayName: Add conda to PATH
 
-  # module=cbflib_adaptbx
-  - script: |
-      call activate test
-      cd $(Pipeline.Workspace)
-      mkdir tests
-      cd tests
-      call libtbx.run_tests_parallel \
-        module=annlib_adaptbx \
-        module=boost_adaptbx \
-        module=cctbx \
-        module=cctbx_website \
-        module=cma_es \
-        module=fable \
-        module=gltbx \
-        module=iotbx \
-        module=libtbx \
-        module=rstbx \
-        module=scitbx \
-        module=smtbx \
-        module=spotfinder \
-        nproc=4
-    failOnStderr: false
-    displayName: Run subset of tests
+      - script: |
+          conda create -n test -c conda-forge -y cctbx-base python=$(PY_VER) junit-xml
+        displayName: Construct latest conda environment
 
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: '$(Pipeline.Workspace)/tests/output.xml'
+      # module=cbflib_adaptbx
+      - script: |
+          call activate test
+          cd $(Pipeline.Workspace)
+          mkdir tests
+          cd tests
+          call libtbx.run_tests_parallel \
+            module=annlib_adaptbx \
+            module=boost_adaptbx \
+            module=cctbx \
+            module=cctbx_website \
+            module=cma_es \
+            module=fable \
+            module=gltbx \
+            module=iotbx \
+            module=libtbx \
+            module=rstbx \
+            module=scitbx \
+            module=smtbx \
+            module=spotfinder \
+            nproc=4
+        failOnStderr: false
+        displayName: Run subset of tests
+
+      - task: PublishTestResults@2
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '$(Pipeline.Workspace)/tests/output.xml'
