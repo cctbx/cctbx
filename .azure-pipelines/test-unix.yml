@@ -10,7 +10,7 @@ steps:
 
   - script: |
       set -xe
-      conda create -n test -c conda-forge -y cctbx-base python=$(PY_VER) junit-xml
+      conda create -n test -c conda-forge -y cctbx-base python=$(PY_VER) pytest junit-xml
     displayName: Construct latest conda environment
 
   # module=cbflib_adaptbx
