@@ -7,6 +7,9 @@ pr: none
 schedules:
   - cron: '0 1 * * *'
     displayName: Nightly conda-forge tests
+    branches:
+      include:
+      - master
 
 jobs:
   - template: ./conda-forge-linux.yml
