@@ -6,12 +6,12 @@ steps:
 
   - script: |
       set -xe
-      conda create -n test -c conda-forge cctbx-base python=$(PY_VER) junit-xml
+      conda create -p ./test -c conda-forge -y cctbx-base python=$(PY_VER) junit-xml
     displayName: Construct latest conda environment
 
   - script: |
       set -xe
-      conda activate test
+      conda activate ./test
       cd $(Pipeline.Workspace)
       mkdir tests
       cd tests
