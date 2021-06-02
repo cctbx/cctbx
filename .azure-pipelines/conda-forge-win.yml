@@ -39,6 +39,8 @@ jobs:
           xcopy /Y /E /I cctbx_project\fable\test\syntax_error %CONDA_PREFIX%\lib\site-packages\fable\test\syntax_error
           xcopy /Y /E /I cctbx_project\fable\test\unsupported %CONDA_PREFIX%\lib\site-packages\fable\test\unsupported
           xcopy /Y /E /I cctbx_project\fable\test\valid %CONDA_PREFIX%\lib\site-packages\fable\test\valid
+          dir %CONDA_PREFIX%\lib\site-packages\ucif\antlr3\src
+          dir %CONDA_PREFIX%\lib\site-packages\fable\test\valid
 
       # module=cbflib_adaptbx
       - script: |
@@ -46,7 +48,7 @@ jobs:
           cd $(Pipeline.Workspace)
           mkdir tests
           cd tests
-          set RSTBX_DIST=%CONDA_PREFIX%\lib\site-packages\rstbx
+          setx RSTBX_DIST=%CONDA_PREFIX%\lib\site-packages\rstbx
           call libtbx.run_tests_parallel ^
             module=annlib_adaptbx ^
             module=boost_adaptbx ^
