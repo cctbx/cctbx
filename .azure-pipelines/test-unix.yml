@@ -1,4 +1,7 @@
 steps:
+  - checkout: cctbx_project
+    path: ./cctbx_project
+
   # add conda to path
   # https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/anaconda?view=azure-devops&tabs=ubuntu-16-04#add-conda-to-your-system-path
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
@@ -13,8 +16,21 @@ steps:
       conda create -n test -c conda-forge -y cctbx-base python=$(PY_VER) pytest junit-xml
     displayName: Construct latest conda environment
 
+  # copy extra test files
+  - script: |
+      set -xe
+      source activate test
+      cd $(Pipeline.Workspace)
+      cp -a cctbx_project/ucif/antlr3 ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/ucif
+      cp cctbx_project/ucif/*.cpp ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/ucif
+      cp cctbx_project/ucif/examples/*.cpp ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/ucif/examples
+      cp -a cctbx_project/fable/test/lenient ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
+      cp -a cctbx_project/fable/test/semantic_error ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
+      cp -a cctbx_project/fable/test/syntax_error ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
+      cp -a cctbx_project/fable/test/unsupported ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
+      cp -a cctbx_project/fable/test/valid ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
+
   # module=cbflib_adaptbx
-  # module=fable
   - script: |
       set -xe
       source activate test
@@ -29,6 +45,7 @@ steps:
         module=cctbx \
         module=cctbx_website \
         module=cma_es \
+        module=fable \
         module=gltbx \
         module=iotbx \
         module=libtbx \

@@ -16,6 +16,9 @@ jobs:
         #   PY_VER: 3.9
 
     steps:
+      - checkout: cctbx_project
+        path: ./cctbx_project
+
       # add conda to path
       - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
         displayName: Add conda to PATH
@@ -24,19 +27,33 @@ jobs:
           conda create -n test -c conda-forge -y cctbx-base python=$(PY_VER) pytest junit-xml
         displayName: Construct latest conda environment
 
+      # copy extra test files
+      - script: |
+          call activate test
+          cd $(Pipeline.Workspace)
+          xcopy /Y /E /I cctbx_project\ucif\antlr3 %CONDA_PREFIX%\lib\site-packages\ucif\antlr3
+          xcopy /Y cctbx_project\ucif\*.cpp %CONDA_PREFIX%\lib\site-packages\ucif\
+          xcopy /Y cctbx_project\ucif\examples\*.cpp %CONDA_PREFIX%\lib\site-packages\ucif\examples\
+          xcopy /Y /E /I cctbx_project\fable\test\lenient %CONDA_PREFIX%\lib\site-packages\fable\test\lenient
+          xcopy /Y /E /I cctbx_project\fable\test\semantic_error %CONDA_PREFIX%\lib\site-packages\fable\test\semantic_error
+          xcopy /Y /E /I cctbx_project\fable\test\syntax_error %CONDA_PREFIX%\lib\site-packages\fable\test\syntax_error
+          xcopy /Y /E /I cctbx_project\fable\test\unsupported %CONDA_PREFIX%\lib\site-packages\fable\test\unsupported
+          xcopy /Y /E /I cctbx_project\fable\test\valid %CONDA_PREFIX%\lib\site-packages\fable\test\valid
+
       # module=cbflib_adaptbx
-      # module=fable
       - script: |
           call activate test
           cd $(Pipeline.Workspace)
           mkdir tests
           cd tests
+          set RSTBX_DIST=%CONDA_PREFIX%\lib\site-packages\rstbx
           call libtbx.run_tests_parallel ^
             module=annlib_adaptbx ^
             module=boost_adaptbx ^
             module=cctbx ^
             module=cctbx_website ^
             module=cma_es ^
+            module=fable ^
             module=gltbx ^
             module=iotbx ^
             module=libtbx ^

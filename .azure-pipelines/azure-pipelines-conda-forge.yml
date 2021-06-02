@@ -11,6 +11,13 @@ schedules:
       include:
       - master
 
+resources:
+  repositories:
+  - repository: cctbx_project
+    type: github
+    name: cctbx/cctbx_project
+    endpoint: cctbx
+
 jobs:
   - template: ./conda-forge-linux.yml
   - template: ./conda-forge-osx.yml
