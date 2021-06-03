@@ -12,8 +12,8 @@ jobs:
           PY_VER: 3.7
         python3.8:
           PY_VER: 3.8
-        # python3.9:
-        #   PY_VER: 3.9
+        python3.9:
+          PY_VER: 3.9
 
     steps:
       - checkout: cctbx_project
@@ -39,8 +39,15 @@ jobs:
           xcopy /Y /E /I cctbx_project\fable\test\syntax_error %CONDA_PREFIX%\lib\site-packages\fable\test\syntax_error
           xcopy /Y /E /I cctbx_project\fable\test\unsupported %CONDA_PREFIX%\lib\site-packages\fable\test\unsupported
           xcopy /Y /E /I cctbx_project\fable\test\valid %CONDA_PREFIX%\lib\site-packages\fable\test\valid
-          dir %CONDA_PREFIX%\lib\site-packages\ucif\antlr3\src
-          dir %CONDA_PREFIX%\lib\site-packages\fable\test\valid
+
+          cd cctbx_project
+          git remote set-url origin https://github.com/bkpoon/cctbx_project.git
+          git fetch --all --prune
+          git checkout test2
+          cd ..
+
+          xcopy /Y cctbx_project\rstbx\indexing\tst_auto_monoscan.py %CONDA_PREFIX%\lib\site-packages\rstbx\indexing\tst_auto_monoscan.py
+          xcopy /Y cctbx_project\rstbx\indexing\tst_dataset1.py %CONDA_PREFIX%\lib\site-packages\rstbx\indexing\tst_dataset1.py
 
       # module=cbflib_adaptbx
       - script: |
@@ -49,7 +56,6 @@ jobs:
           cd $(Pipeline.Workspace)
           mkdir tests
           cd tests
-          set "RSTBX_DIST=%CONDA_PREFIX%\lib\site-packages\rstbx"
           call libtbx.run_tests_parallel ^
             module=annlib_adaptbx ^
             module=boost_adaptbx ^
@@ -65,8 +71,6 @@ jobs:
             module=smtbx ^
             module=spotfinder ^
             nproc=4
-          set
-          libtbx.python %CONDA_PREFIX%\lib\site-packages\rstbx\indexing\tst_auto_monoscan.py
         failOnStderr: false
         displayName: Run subset of tests
 
