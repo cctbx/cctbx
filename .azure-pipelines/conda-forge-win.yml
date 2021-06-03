@@ -49,7 +49,7 @@ jobs:
           cd $(Pipeline.Workspace)
           mkdir tests
           cd tests
-          setx RSTBX_DIST="%CONDA_PREFIX%\lib\site-packages\rstbx"
+          set "RSTBX_DIST=%CONDA_PREFIX%\lib\site-packages\rstbx"
           call libtbx.run_tests_parallel ^
             module=annlib_adaptbx ^
             module=boost_adaptbx ^
