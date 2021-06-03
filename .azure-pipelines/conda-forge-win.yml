@@ -40,14 +40,9 @@ jobs:
           xcopy /Y /E /I cctbx_project\fable\test\unsupported %CONDA_PREFIX%\lib\site-packages\fable\test\unsupported
           xcopy /Y /E /I cctbx_project\fable\test\valid %CONDA_PREFIX%\lib\site-packages\fable\test\valid
 
-          cd cctbx_project
-          git remote set-url origin https://github.com/bkpoon/cctbx_project.git
-          git fetch --all --prune
-          git checkout test2
-          cd ..
-
           xcopy /Y cctbx_project\rstbx\indexing\tst_auto_monoscan.py %CONDA_PREFIX%\lib\site-packages\rstbx\indexing\tst_auto_monoscan.py
           xcopy /Y cctbx_project\rstbx\indexing\tst_dataset1.py %CONDA_PREFIX%\lib\site-packages\rstbx\indexing\tst_dataset1.py
+        displayName: Copy additional test files for fable and iotbx tests
 
       # module=cbflib_adaptbx
       - script: |

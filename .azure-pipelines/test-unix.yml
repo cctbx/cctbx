@@ -29,6 +29,7 @@ steps:
       cp -a cctbx_project/fable/test/syntax_error ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
       cp -a cctbx_project/fable/test/unsupported ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
       cp -a cctbx_project/fable/test/valid ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
+    displayName: Copy additional test files for fable and iotbx tests
 
   # module=cbflib_adaptbx
   - script: |
