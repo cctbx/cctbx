@@ -49,7 +49,7 @@ jobs:
           cd $(Pipeline.Workspace)
           mkdir tests
           cd tests
-          @set "RSTBX_DIST=%CONDA_PREFIX%\lib\site-packages\rstbx"
+          set "RSTBX_DIST=%CONDA_PREFIX%\lib\site-packages\rstbx"
           call libtbx.run_tests_parallel ^
             module=annlib_adaptbx ^
             module=boost_adaptbx ^
@@ -65,6 +65,8 @@ jobs:
             module=smtbx ^
             module=spotfinder ^
             nproc=4
+          set
+          libtbx.python %CONDA_PREFIX%\lib\site-packages\rstbx\indexing\tst_auto_monoscan.py
         failOnStderr: false
         displayName: Run subset of tests
 
