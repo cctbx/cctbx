@@ -9,8 +9,8 @@ jobs:
   # variables for version
   variables:
     year: $(Get-Date -Format yyyy)
-    month: $(Get-Date -Format MM)
-    day: $(Get-Date -Format dd)
+    month: $(Get-Date -Format M)
+    day: $(Get-Date -Format d)
     version: $(year).$(month).a$(day)
 
   steps:
