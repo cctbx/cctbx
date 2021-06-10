@@ -24,9 +24,13 @@ jobs:
 
   # set version
   - powershell: |
+      Env:trimmed_month = $(month).TrimStart("0")
+      Env:trimmed_day = $(day).TrimStart("0")
+      Write-Host Env:trimmed_month
+      Write-Host Env:trimmed_day
       Write-Host "##vso[task.setVariable variable=year]$(year)"
-      Write-Host "##vso[task.setVariable variable=month]$(month).TrimStart("0")"
-      Write-Host "##vso[task.setVariable variable=day]$(day).TrimStart("0")"
+      Write-Host "##vso[task.setVariable variable=month]$Env:trimmed_month"
+      Write-Host "##vso[task.setVariable variable=day]$Env:trimmed_day"
       Write-Host $(year)
       Write-Host $(month)
       Write-Host $(day)
