@@ -9,8 +9,8 @@ jobs:
   # variables for version
   variables:
     year: $(Get-Date -Format yyyy)
-    month: $(Get-Date -Format M)
-    day: $(Get-Date -Format d)
+    month: $(Get-Date -Format MM)
+    day: $(Get-Date -Format dd)
     version: $(year).$(month).a$(day)
 
   steps:
@@ -25,8 +25,8 @@ jobs:
   # set version
   - powershell: |
       Write-Host "##vso[task.setVariable variable=year]$(year)"
-      Write-Host "##vso[task.setVariable variable=month]$(month)"
-      Write-Host "##vso[task.setVariable variable=day]$(day)"
+      Write-Host "##vso[task.setVariable variable=month]$(month.trimstart("0"))"
+      Write-Host "##vso[task.setVariable variable=day]$(day.trimstart("0"))"
       Write-Host $(year)
       Write-Host $(month)
       Write-Host $(day)
