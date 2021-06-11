@@ -20,5 +20,11 @@ resources:
 
 jobs:
   - template: ./conda-forge-linux.yml
+    parameters:
+      channel: conda-forge
   - template: ./conda-forge-osx.yml
+    parameters:
+      channel: conda-forge
   - template: ./conda-forge-win.yml
+    parameters:
+      channel: conda-forge

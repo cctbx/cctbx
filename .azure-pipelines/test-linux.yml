@@ -16,6 +16,6 @@ jobs:
           PY_VER: 3.9
 
     steps:
-    - template: ./test-unix.yml
+    - template: ./templates/test-unix.yml
       parameters:
         PY_VER: $(PY_VER)

@@ -1,0 +1,30 @@
+# Nightly tests of conda-forge package
+
+# no continuous integration builds or pull requests
+trigger: none
+pr: none
+
+schedules:
+  - cron: '0 1 * * *'
+    displayName: Nightly cctbx-dev tests
+    branches:
+      include:
+      - master
+
+resources:
+  repositories:
+  - repository: cctbx_project
+    type: github
+    name: cctbx/cctbx_project
+    endpoint: cctbx
+
+jobs:
+  - template: ./conda-forge-linux.yml
+    parameters:
+      channel: cctbx-dev
+  - template: ./conda-forge-osx.yml
+    parameters:
+      channel: cctbx-dev
+  - template: ./conda-forge-win.yml
+    parameters:
+      channel: cctbx-dev
