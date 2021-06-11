@@ -21,10 +21,10 @@ resources:
 jobs:
   - template: ./test-linux.yml
     parameters:
-      channel: conda-forge
+      CHANNEL: conda-forge
   - template: ./test-osx.yml
     parameters:
-      channel: conda-forge
+      CHANNEL: conda-forge
   - template: ./test-win.yml
     parameters:
-      channel: conda-forge
+      CHANNEL: conda-forge

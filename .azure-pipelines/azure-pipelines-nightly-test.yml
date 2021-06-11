@@ -21,10 +21,10 @@ resources:
 jobs:
   - template: ./test-linux.yml
     parameters:
-      channel: cctbx-dev
+      CHANNEL: cctbx-dev
   - template: ./test-osx.yml
     parameters:
-      channel: cctbx-dev
+      CHANNEL: cctbx-dev
   - template: ./test-win.yml
     parameters:
-      channel: cctbx-dev
+      CHANNEL: cctbx-dev

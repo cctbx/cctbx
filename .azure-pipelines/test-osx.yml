@@ -18,4 +18,5 @@ jobs:
     steps:
     - template: ./templates/test-unix.yml
       parameters:
+        CHANNEL: $(CHANNEL)
         PY_VER: $(PY_VER)
