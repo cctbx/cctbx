@@ -19,12 +19,12 @@ resources:
     endpoint: cctbx
 
 jobs:
-  - template: ./conda-forge-linux.yml
+  - template: ./test-linux.yml
     parameters:
       channel: cctbx-dev
-  - template: ./conda-forge-osx.yml
+  - template: ./test-osx.yml
     parameters:
       channel: cctbx-dev
-  - template: ./conda-forge-win.yml
+  - template: ./test-win.yml
     parameters:
       channel: cctbx-dev
