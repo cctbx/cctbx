@@ -18,5 +18,5 @@ jobs:
     steps:
     - template: ./templates/test-unix.yml
       parameters:
-        CHANNEL: $(CHANNEL)
+        CHANNEL: ${{ parameters.CHANNEL }}
         PY_VER: $(PY_VER)
