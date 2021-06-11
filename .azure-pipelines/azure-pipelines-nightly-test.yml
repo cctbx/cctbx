@@ -6,7 +6,7 @@ pr: none
 
 schedules:
   - cron: '0 1 * * *'
-    displayName: Nightly cctbx-dev tests
+    displayName: Nightly cctbx-nightly tests
     branches:
       include:
       - master
@@ -21,10 +21,10 @@ resources:
 jobs:
   - template: ./test-linux.yml
     parameters:
-      CHANNEL: cctbx-dev
+      CHANNEL: cctbx-nightly
   - template: ./test-osx.yml
     parameters:
-      CHANNEL: cctbx-dev
+      CHANNEL: cctbx-nightly
   - template: ./test-win.yml
     parameters:
-      CHANNEL: cctbx-dev
+      CHANNEL: cctbx-nightly
