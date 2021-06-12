@@ -11,7 +11,7 @@ jobs:
     year: $(Get-Date -Format yyyy)
     month: $(Get-Date -Format MM)
     day: $(Get-Date -Format dd)
-    version: $(year).$(month).a$(day)
+    version: $(year).$(month)a$(day)
 
   steps:
 
