@@ -1,0 +1,108 @@
+# Update cctbx source
+
+# no continuous integration builds or pull requests
+trigger: none
+pr: none
+
+schedules:
+  - cron: '0 2 * * *'
+    displayName: Nightly source update
+    branches:
+      include:
+      - master
+
+jobs:
+- job: Update_cctbx_source
+  pool:
+    vmImage: ubuntu-latest
+  timeoutInMinutes: 120
+
+  # variables for version
+  variables:
+    year: $(Get-Date -Format yyyy)
+    month: $(Get-Date -Format MM)
+    day: $(Get-Date -Format dd)
+    version: $(year).$(month).a$(day)
+
+  steps:
+
+  # set version
+  - powershell: |
+      $trimmed_month = $(month).TrimStart("0")
+      $trimmed_day = $(day).TrimStart("0")
+      Write-Host $trimmed_month
+      Write-Host $trimmed_day
+      Write-Host "##vso[task.setVariable variable=year]$(year)"
+      Write-Host "##vso[task.setVariable variable=month]$trimmed_month"
+      Write-Host "##vso[task.setVariable variable=day]$trimmed_day"
+      Write-Host $(year)
+      Write-Host $(month)
+      Write-Host $(day)
+    displayName: Set variables from date
+
+  - script: |
+      version=$(year).$(month).a$(day)
+      echo "##vso[task.setVariable variable=version]$version"
+      echo $(version)
+    displayName: Set version
+
+  - script: |
+      set -x -e
+      release=`echo $(Build.SourceBranch) | sed 's/refs\/heads\/releases\///'`
+      echo "##vso[task.setVariable variable=version]$release"
+      echo $(version)
+    displayName: Override version for release branch
+    condition: startswith(variables['Build.SourceBranch'], 'refs/heads/releases/')
+
+  # download sources
+  - checkout: self
+    submodules: recursive
+    persistCredentials: true
+
+  # update modules (except for eigen and scons)
+  - script: |
+      set -x -e
+
+      git config user.name "Billy K. Poon"
+      git config user.email "bkpoon@lbl.gov"
+
+      git checkout nightly
+      git reset --hard origin/master
+
+      cd modules
+      for module in annlib annlib_adaptbx boost ccp4io ccp4io_adaptbx \
+        cctbx_project clipper gui_resources tntbx; do
+        cd ${module}
+        git checkout master
+        git pull --rebase
+        cd ..
+      done
+
+      for module in cbflib dxtbx; do
+        cd ${module}
+        git checkout main
+        git pull --rebase
+        cd ..
+      done
+
+      git commit -am "Update for v$(version)"
+      git push -f -u origin nightly
+    displayName: Update sources
+    continueOnError: true
+
+  # create new tag only if previous step succeeds without issues
+  - script: |
+      set -x -e
+      git tag v$(version)
+      git push -u origin v$(version)
+    displayName: Create new tag
+    condition: in(variables['Agent.JobStatus'], 'Succeeded')
+
+  # bump master only if previous step succeeds without issues
+  - script: |
+      set -x -e
+      git checkout master
+      git rebase nightly
+      git push -u origin master
+    displayName: Update master branch
+    condition: in(variables['Agent.JobStatus'], 'Succeeded')
