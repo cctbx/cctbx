@@ -41,7 +41,7 @@ jobs:
     displayName: Set variables from date
 
   - script: |
-      version=$(year).$(month).a$(day)
+      version=$(year).$(month)a$(day)
       echo "##vso[task.setVariable variable=version]$version"
       echo $(version)
     displayName: Set version
