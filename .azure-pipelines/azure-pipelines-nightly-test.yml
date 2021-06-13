@@ -5,7 +5,7 @@ trigger: none
 pr: none
 
 schedules:
-  - cron: '0 1 * * *'
+  - cron: '0 5 * * *'
     displayName: Nightly cctbx-nightly tests
     branches:
       include:
