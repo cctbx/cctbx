@@ -106,13 +106,14 @@ jobs:
         module=spotfinder \
         nproc=4
     failOnStderr: false
+    continueOnError: true
     displayName: Test
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: './tests/output.xml'
+      testResultsFiles: './cctbx/tests/output.xml'
 
   # build source tarball
   - script: |
@@ -126,4 +127,3 @@ jobs:
   # publish source tarball as artifact
   - publish: ./dist/$(version)/cctbx-$(version).tar.gz
     artifact: cctbx-$(version)
-    continueOnError: true
