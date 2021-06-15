@@ -4,19 +4,21 @@
 trigger: none
 pr: none
 
-schedules:
-  - cron: '0 5 * * *'
-    displayName: Nightly cctbx-nightly tests
-    branches:
-      include:
-      - master
-
 resources:
   repositories:
   - repository: cctbx_project
     type: github
     name: cctbx/cctbx_project
     endpoint: cctbx
+  # trigger tests after build finishes
+  pipelines:
+  - pipeline: nightly_feedstock
+    project: feedstock-builds
+    source: nightly-feedstock
+    trigger:
+      branches:
+        include:
+        - master
 
 jobs:
   - template: ./test-linux.yml
