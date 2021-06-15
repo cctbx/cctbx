@@ -72,7 +72,7 @@ jobs:
 
       git checkout test
 
-      python ./recipe/update-meta.py \
+      python ./recipe/update_meta.py \
         --organization $(System.CollectionId) \
         --project $(System.TeamProject) \
         --runId $(Build.TriggeredBy.BuildId) \
