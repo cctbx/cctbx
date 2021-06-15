@@ -73,9 +73,9 @@ jobs:
       git checkout test
 
       python ./recipe/update_meta.py \
-        --organization $(System.CollectionId) \
+        --organization cctbx-release \
         --project $(System.TeamProject) \
-        --runId $(Build.TriggeredBy.BuildId) \
+        --runId $(resources.pipeline.source_tarball.runID) \
         --new-version $(version) \
         --meta-path ./recipe/meta.yaml
 
