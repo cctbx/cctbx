@@ -97,7 +97,7 @@ jobs:
   - script: |
       set -x -e
 
-      conda create -n smithy -c conda-forge conda-smithy
+      conda create -n smithy -c conda-forge -y conda-smithy
       conda activate smithy
 
       git config user.name "Billy K. Poon"
