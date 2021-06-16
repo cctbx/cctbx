@@ -1,5 +1,9 @@
 # Update nightly-feedstock to trigger building of conda packages
 
+# no continuous integration builds or pull requests
+trigger: none
+pr: none
+
 resources:
   pipelines:
   - pipeline: source_tarball
@@ -63,6 +67,11 @@ jobs:
   - checkout: nightly_feedstock
     persistCredentials: true
 
+  # add conda to path
+  # https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/anaconda?view=azure-devops&tabs=ubuntu-16-04#add-conda-to-your-system-path
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
   # update cctbx/nightly-feedstock to trigger conda package builds
   - script: |
       set -x -e
@@ -70,7 +79,7 @@ jobs:
       git config user.name "Billy K. Poon"
       git config user.email "bkpoon@lbl.gov"
 
-      git checkout test
+      git checkout master
 
       python ./recipe/update_meta.py \
         --organization cctbx-release \
@@ -80,6 +89,24 @@ jobs:
         --meta-path ./recipe/meta.yaml
 
       git commit -am "Update for v$(version)"
-      git push -f -u origin test
+      git push -u origin master
     displayName: Update nighty-feedstock
+    condition: eq(variables['Build.Reason'], 'ResourceTrigger')
+
+  # rerender feedstock
+  - script: |
+      set -x -e
+
+      conda create -n smithy -c conda-forge conda-smithy
+      conda activate smithy
+
+      git config user.name "Billy K. Poon"
+      git config user.email "bkpoon@lbl.gov"
+
+      git checkout master
+
+      conda smithy rerender -c auto
+
+      git push -u origin master
+    displayName: Rerender nighty-feedstock
     condition: eq(variables['Build.Reason'], 'ResourceTrigger')
