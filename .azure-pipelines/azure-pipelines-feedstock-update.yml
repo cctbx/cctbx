@@ -96,5 +96,5 @@ jobs:
       conda smithy rerender -c auto
 
       git push -u origin master
-    displayName: Update and rerender nighty-feedstock
+    displayName: Update and rerender nightly-feedstock
     condition: eq(variables['Build.Reason'], 'ResourceTrigger')
