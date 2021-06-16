@@ -89,24 +89,12 @@ jobs:
         --meta-path ./recipe/meta.yaml
 
       git commit -am "Update for v$(version)"
-      git push -u origin master
-    displayName: Update nighty-feedstock
-    condition: eq(variables['Build.Reason'], 'ResourceTrigger')
-
-  # rerender feedstock
-  - script: |
-      set -x -e
 
       conda create -n smithy -c conda-forge -y conda-smithy
-      conda activate smithy
-
-      git config user.name "Billy K. Poon"
-      git config user.email "bkpoon@lbl.gov"
-
-      git checkout master
+      source activate smithy
 
       conda smithy rerender -c auto
 
       git push -u origin master
-    displayName: Rerender nighty-feedstock
+    displayName: Update and rerender nighty-feedstock
     condition: eq(variables['Build.Reason'], 'ResourceTrigger')
