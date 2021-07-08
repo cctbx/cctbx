@@ -78,12 +78,17 @@ jobs:
         cd ..
       done
 
-      for module in cbflib dxtbx; do
+      for module in cbflib; do
         cd ${module}
         git checkout main
         git pull --rebase
         cd ..
       done
+
+      cd dxtbx
+      git checkout dials-3.5
+      git pull --rebase
+      cd ..
 
       git commit -am "Update for v$(version)"
       git push -f -u origin nightly
