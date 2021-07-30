@@ -113,7 +113,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: './cctbx/tests/output.xml'
+      testResultsFiles: './tests/output.xml'
 
   # build source tarball
   - script: |
