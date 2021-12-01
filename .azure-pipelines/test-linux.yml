@@ -4,10 +4,8 @@ jobs:
       vmImage: ubuntu-latest
     timeoutInMinutes: 120
     strategy:
-      maxParallel: 2
+      maxParallel: 3
       matrix:
-        python3.6:
-          PY_VER: 3.6
         python3.7:
           PY_VER: 3.7
         python3.8:
