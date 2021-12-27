@@ -17,6 +17,9 @@ jobs:
           PY_VER: 3.9
 
     steps:
+      - checkout: self
+        path: ./cctbx
+
       - checkout: cctbx_project
         path: ./cctbx_project
 
@@ -44,6 +47,14 @@ jobs:
           xcopy /Y cctbx_project\rstbx\indexing\tst_auto_monoscan.py %CONDA_PREFIX%\lib\site-packages\rstbx\indexing\tst_auto_monoscan.py
           xcopy /Y cctbx_project\rstbx\indexing\tst_dataset1.py %CONDA_PREFIX%\lib\site-packages\rstbx\indexing\tst_dataset1.py
         displayName: Copy additional test files for fable and iotbx tests
+
+      - script: |
+          call activate test
+          cd $(Pipeline.Workspace)
+          python cctbx/.azure-pipelines/scripts/download-phenix-regression.py --organization cctbx --project cctbx_project
+          unzip phenix_regression.zip
+          mv phenix_regression %CONDA_PREFIX%\lib\site-packages
+        displayName: Copy phenix_regression artifact
 
       # module=cbflib_adaptbx
       - script: |

@@ -3,6 +3,9 @@
 #   PY_VER
 
 steps:
+  - checkout: self
+    path: ./cctbx
+
   - checkout: cctbx_project
     path: ./cctbx_project
 
@@ -34,6 +37,16 @@ steps:
       cp -a cctbx_project/fable/test/unsupported ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
       cp -a cctbx_project/fable/test/valid ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages/fable/test
     displayName: Copy additional test files for fable and iotbx tests
+
+  - script: |
+      set -xe
+      source activate test
+      cd $(Pipeline.Workspace)
+      python cctbx/.azure-pipelines/scripts/download-phenix-regression.py --organization cctbx --project cctbx_project
+      unzip phenix_regression.zip
+      mv phenix_regression ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages
+      ls ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages
+    displayName: Copy phenix_regression artifact
 
   # module=cbflib_adaptbx
   - script: |

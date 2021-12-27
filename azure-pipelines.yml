@@ -59,6 +59,15 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
+  - script: |
+      set -xe
+      conda create -n test -y requests
+      source activate test
+      cd modules
+      python ../.azure-pipelines/scripts/download-phenix-regression.py --organization cctbx --project cctbx_project
+      unzip phenix_regression.zip
+    displayName: Copy phenix_regression artifact
+
   # link bootstrap.py
   - script: |
       set -x -e
