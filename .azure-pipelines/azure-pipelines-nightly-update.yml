@@ -47,7 +47,7 @@ jobs:
     displayName: Set version
 
   - script: |
-      set -x -e
+      set -xe
       release=`echo $(Build.SourceBranch) | sed 's/refs\/heads\/releases\///'`
       echo "##vso[task.setVariable variable=version]$release"
       echo $(version)
@@ -61,7 +61,7 @@ jobs:
 
   # update modules (except for eigen and scons)
   - script: |
-      set -x -e
+      set -xe
 
       git config user.name "Billy K. Poon"
       git config user.email "bkpoon@lbl.gov"
@@ -97,7 +97,7 @@ jobs:
 
   # create new tag only if previous step succeeds without issues
   - script: |
-      set -x -e
+      set -xe
       git tag v$(version)
       git push -u origin v$(version)
     displayName: Create new tag
@@ -105,7 +105,7 @@ jobs:
 
   # bump master only if previous step succeeds without issues
   - script: |
-      set -x -e
+      set -xe
       git checkout master
       git rebase nightly
       git push -u origin master

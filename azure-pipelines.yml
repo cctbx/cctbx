@@ -43,7 +43,7 @@ jobs:
     displayName: Set version
 
   - script: |
-      set -x -e
+      set -xe
       release=`echo $(Build.SourceBranch) | sed 's/refs\/heads\/releases\///'`
       echo "##vso[task.setVariable variable=version]$release"
       echo $(version)
@@ -70,13 +70,13 @@ jobs:
 
   # link bootstrap.py
   - script: |
-      set -x -e
+      set -xe
       ln -s modules/cctbx_project/libtbx/auto_build/bootstrap.py
     displayName: Link bootstrap.py
 
   # base and build
   - script: |
-      set -x -e
+      set -xe
       python bootstrap.py base build --builder=cctbx --use-conda --python 38 --nproc=4
       cd build
       source setpaths.sh
@@ -86,13 +86,13 @@ jobs:
     displayName: Configure and Build
 
   - script: |
-      set -x -e
+      set -xe
       conda install -p conda_base -y -c conda-forge --no-deps --freeze-installed junit-xml
     displayName: Install junit-xml
 
   # test
   - script: |
-      set -x -e
+      set -xe
       source ./build/setpaths.sh
       mkdir tests
       cd tests

@@ -64,7 +64,7 @@ jobs:
     displayName: Set version
 
   - script: |
-      set -x -e
+      set -xe
       release=`echo $(Build.SourceBranch) | sed 's/refs\/heads\/releases\///'`
       echo "##vso[task.setVariable variable=version]$release"
       echo $(version)
@@ -82,7 +82,7 @@ jobs:
 
   # update cctbx/nightly-feedstock to trigger conda package builds
   - script: |
-      set -x -e
+      set -xe
 
       git config user.name "Billy K. Poon"
       git config user.email "bkpoon@lbl.gov"
