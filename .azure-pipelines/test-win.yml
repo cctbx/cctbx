@@ -4,7 +4,7 @@
 jobs:
   - job: win_64
     pool:
-      vmImage: windows-latest
+      vmImage: windows-2019
     timeoutInMinutes: 120
     strategy:
       maxParallel: 3
