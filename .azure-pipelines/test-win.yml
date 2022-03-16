@@ -30,7 +30,7 @@ jobs:
         displayName: Add conda to PATH
 
       - script: |
-          conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest junit-xml
+          conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest=7.0 junit-xml
         displayName: Construct latest conda environment
 
       # copy extra test files
