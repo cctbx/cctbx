@@ -87,7 +87,7 @@ jobs:
       git config user.name "Billy K. Poon"
       git config user.email "bkpoon@lbl.gov"
 
-      git checkout master
+      git checkout main
 
       python ./recipe/update_meta.py \
         --organization cctbx-release \
@@ -105,6 +105,6 @@ jobs:
 
       git remote set-url origin git@github.com:cctbx/nightly-feedstock.git
 
-      git push -u origin master
+      git push -u origin main
     displayName: Update and rerender nightly-feedstock
     condition: eq(variables['Build.Reason'], 'ResourceTrigger')
