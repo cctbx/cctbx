@@ -30,8 +30,10 @@ jobs:
         displayName: Add conda to PATH
 
       - script: |
+          conda remove -n test -y --all
           conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest=7.0 junit-xml
         displayName: Construct latest conda environment
+        retryCountOnTaskFailure: 3
 
       # copy extra test files
       - script: |
@@ -53,16 +55,19 @@ jobs:
       - script: |
           call activate test
           cd $(Pipeline.Workspace)
+          del phenix_regression.zip
           python cctbx/.azure-pipelines/scripts/download-phenix-regression.py --organization cctbx --project cctbx_project
           unzip phenix_regression.zip
           mv phenix_regression %CONDA_PREFIX%\lib\site-packages
         displayName: Copy phenix_regression artifact
+        retryCountOnTaskFailure: 3
 
       # module=cbflib_adaptbx
       - script: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           call activate test
           cd $(Pipeline.Workspace)
+          rmdir /S /Q tests
           mkdir tests
           cd tests
           call libtbx.run_tests_parallel ^
@@ -82,6 +87,7 @@ jobs:
             nproc=4
         failOnStderr: false
         displayName: Run subset of tests
+        retryCountOnTaskFailure: 3
 
       - task: PublishTestResults@2
         condition: succeededOrFailed()

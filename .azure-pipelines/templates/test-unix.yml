@@ -20,8 +20,10 @@ steps:
 
   - script: |
       set -xe
+      conda remove -n test -y --all
       conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest junit-xml
     displayName: Construct latest conda environment
+    retryCountOnTaskFailure: 3
 
   # copy extra test files
   - script: |
@@ -42,17 +44,20 @@ steps:
       set -xe
       source activate test
       cd $(Pipeline.Workspace)
+      rm -f phenix_regression.zip
       python cctbx/.azure-pipelines/scripts/download-phenix-regression.py --organization cctbx --project cctbx_project
       unzip phenix_regression.zip
       mv phenix_regression ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages
       ls ${CONDA_PREFIX}/lib/python$(PY_VER)/site-packages
     displayName: Copy phenix_regression artifact
+    retryCountOnTaskFailure: 3
 
   # module=cbflib_adaptbx
   - script: |
       set -xe
       source activate test
       cd $(Pipeline.Workspace)
+      rm -fr tests
       mkdir tests
       cd tests
       export PYTHONDEVMODE=1
@@ -74,6 +79,7 @@ steps:
         nproc=4
     failOnStderr: false
     displayName: Run subset of tests
+    retryCountOnTaskFailure: 3
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
