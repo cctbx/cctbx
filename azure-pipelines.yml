@@ -61,12 +61,14 @@ jobs:
 
   - script: |
       set -xe
+      conda remove -n test -y --all
       conda create -n test -y requests
       source activate test
       cd modules
       python ../.azure-pipelines/scripts/download-phenix-regression.py --organization cctbx --project cctbx_project
       unzip phenix_regression.zip
     displayName: Copy phenix_regression artifact
+    retryCountOnTaskFailure: 3
 
   # link bootstrap.py
   - script: |
