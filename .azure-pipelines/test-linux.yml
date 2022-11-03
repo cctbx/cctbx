@@ -14,6 +14,8 @@ jobs:
           PY_VER: 3.9
         python3.10:
           PY_VER: 3.10
+        python3.11:
+          PY_VER: 3.11
 
     steps:
     - template: ./templates/test-unix.yml

@@ -17,6 +17,8 @@ jobs:
           PY_VER: 3.9
         python3.10:
           PY_VER: 3.10
+        python3.11:
+          PY_VER: 3.11
 
     steps:
       - checkout: self
@@ -31,7 +33,9 @@ jobs:
 
       - script: |
           conda remove -n test -y --all
-          conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest=7.0 junit-xml
+          conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) junit-xml
+          conda activate test
+          pip install pytest==7.0
         displayName: Construct latest conda environment
         retryCountOnTaskFailure: 3
 
@@ -56,7 +60,7 @@ jobs:
           call activate test
           cd $(Pipeline.Workspace)
           del phenix_regression.zip
-          python cctbx/.azure-pipelines/scripts/download-phenix-regression.py --organization cctbx --project cctbx_project
+          python cctbx\.azure-pipelines\scripts\download-phenix-regression.py --organization cctbx --project cctbx_project
           unzip phenix_regression.zip
           mv phenix_regression %CONDA_PREFIX%\lib\site-packages
         displayName: Copy phenix_regression artifact
