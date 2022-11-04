@@ -31,7 +31,7 @@ jobs:
 
       - script: |
           conda remove -n test -y --all
-          conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest junit-xml
+          conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest=7.0 junit-xml
         displayName: Construct latest conda environment
         retryCountOnTaskFailure: 3
 
