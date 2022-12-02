@@ -3,7 +3,7 @@
 jobs:
 - job: Build_cctbx_source_tarball
   pool:
-    vmImage: ubuntu-latest
+    vmImage: ubuntu-20.04
   timeoutInMinutes: 120
 
   # variables for version
