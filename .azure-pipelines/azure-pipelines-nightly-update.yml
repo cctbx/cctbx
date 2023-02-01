@@ -86,7 +86,7 @@ jobs:
       done
 
       cd dxtbx
-      git checkout dials-3.5
+      git checkout dials-3.8
       git pull --rebase
       cd ..
 
