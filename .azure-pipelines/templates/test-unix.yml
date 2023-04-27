@@ -20,6 +20,13 @@ steps:
 
   - script: |
       set -xe
+      conda install -n base -y conda-libmamba-solver
+      conda config --set solver libmamba
+    displayName: Install libmamba sovler
+    retryCountOnTaskFailure: 3
+
+  - script: |
+      set -xe
       conda remove -n test -y --all
       conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest junit-xml
     displayName: Construct latest conda environment
