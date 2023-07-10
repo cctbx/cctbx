@@ -28,7 +28,7 @@ steps:
   - script: |
       set -xe
       conda remove -n test -y --all
-      conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest junit-xml
+      conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) pytest junit-xml zipp=3.15
     displayName: Construct latest conda environment
     retryCountOnTaskFailure: 3
 
