@@ -4,7 +4,7 @@
 jobs:
   - job: win_64
     pool:
-      vmImage: windows-2019
+      vmImage: windows-latest
     timeoutInMinutes: 120
     strategy:
       maxParallel: 3
@@ -19,6 +19,8 @@ jobs:
           PY_VER: 3.10
         python3.11:
           PY_VER: 3.11
+        python3.12:
+          PY_VER: 3.12
 
     steps:
       - checkout: self
@@ -68,7 +70,7 @@ jobs:
 
       # module=cbflib_adaptbx
       - script: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           call activate test
           cd $(Pipeline.Workspace)
           rmdir /S /Q tests
