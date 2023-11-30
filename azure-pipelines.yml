@@ -89,7 +89,9 @@ jobs:
 
   - script: |
       set -xe
-      conda install -p conda_base -y -c conda-forge --no-deps --freeze-installed junit-xml
+      cd build
+      source setpaths.sh
+      libtbx.pip install junit-xml
     displayName: Install junit-xml
 
   # test
