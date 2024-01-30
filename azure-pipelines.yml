@@ -1,5 +1,10 @@
 # Build cctbx source tarball
 
+trigger:
+  branches:
+    exclude:
+      - nightly
+
 jobs:
 - job: Build_cctbx_source_tarball
   pool:
