@@ -33,7 +33,7 @@ jobs:
 
       - script: |
           conda remove -n test -y --all
-          conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) junit-xml
+          conda create -n test -c ${{ parameters.CHANNEL }} -c conda-forge -y cctbx python=$(PY_VER) junit-xml setuptools=69.0
           call activate test
           pip install pytest==7.0
         displayName: Construct latest conda environment
