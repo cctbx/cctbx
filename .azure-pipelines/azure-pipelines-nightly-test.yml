@@ -10,7 +10,7 @@ schedules:
     displayName: Run Python 3.12 tests
     branches:
       include:
-      - ci
+      - py312_test
 
 resources:
   repositories:
