@@ -80,6 +80,31 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
+  # try rerendering
+  - script: |
+      set -xe
+
+      git config user.name "Billy K. Poon"
+      git config user.email "bkpoon@lbl.gov"
+
+      git checkout main
+
+      conda create -n smithy -c conda-forge -y conda-smithy
+      source activate smithy
+
+      conda smithy rerender -c auto
+    displayName: Rerender feedstock
+    continueOnError: true
+
+  # reset repository if rerendering fails
+  - script: |
+      set -xe
+
+      git reset --hard origin/main
+
+    displayName: Reset repository if rerendering fails
+    condition: failed()
+
   # update cctbx/nightly-feedstock to trigger conda package builds
   - script: |
       set -xe
@@ -97,11 +122,6 @@ jobs:
         --meta-path ./recipe/meta.yaml
 
       git commit -am "Update for v$(version)"
-
-      conda create -n smithy -c conda-forge -y conda-smithy
-      source activate smithy
-
-      conda smithy rerender -c auto
 
       git remote set-url origin git@github.com:cctbx/nightly-feedstock.git
 
