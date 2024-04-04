@@ -4,14 +4,6 @@
 trigger: none
 pr: none
 
-# schedule run for Python 3.12
-schedules:
-  - cron: '0 8 * * *'
-    displayName: Run Python 3.12 tests
-    branches:
-      include:
-      - py312_test
-
 resources:
   repositories:
   - repository: cctbx_project
