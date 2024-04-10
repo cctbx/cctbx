@@ -22,7 +22,7 @@ def get_runId(organization, project, definitions, api_version):
   # https://docs.microsoft.com/en-us/rest/api/azure/devops/build/builds/list?view=azure-devops-rest-6.0
   # https://dev.azure.com/{organization}/{project}/_apis/build/builds?definitions={definitions}&queues={queues}&buildNumber={buildNumber}&minTime={minTime}&maxTime={maxTime}&requestedFor={requestedFor}&reasonFilter={reasonFilter}&statusFilter={statusFilter}&resultFilter={resultFilter}&tagFilters={tagFilters}&properties={properties}&$top={$top}&continuationToken={continuationToken}&maxBuildsPerDefinition={maxBuildsPerDefinition}&deletedFilter={deletedFilter}&queryOrder={queryOrder}&branchName={branchName}&buildIds={buildIds}&repositoryId={repositoryId}&repositoryType={repositoryType}&api-version={api_version}
   # url = f'https://dev.azure.com/{organization}/{project}/_apis/build/builds?api-version=6.0'
-  url = f'https://dev.azure.com/{organization}/{project}/_apis/build/builds?definitions={definitions}&api-version={api_version}'
+  url = f'https://dev.azure.com/{organization}/{project}/_apis/build/builds?definitions={definitions}&resultFilter=succeeded&statusFilter=completed&api-version={api_version}'
   return url
 
 # =============================================================================
