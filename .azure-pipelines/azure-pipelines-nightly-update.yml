@@ -111,12 +111,3 @@ jobs:
       git push -u origin master
     displayName: Update master branch
     condition: in(variables['Agent.JobStatus'], 'Succeeded')
-
-  # bump ci only if previous step succeeds without issues
-  - script: |
-      set -xe
-      git checkout py312_test
-      git rebase master
-      git push -f -u origin py312_test
-    displayName: Update py312_test branch
-    condition: in(variables['Agent.JobStatus'], 'Succeeded')
