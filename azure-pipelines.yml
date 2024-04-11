@@ -70,7 +70,12 @@ jobs:
       conda create -n test -y requests
       source activate test
       cd modules
-      python ../.azure-pipelines/scripts/download-phenix-regression.py --organization cctbx --project cctbx_project
+      python cctbx/scripts/download-azure-artifact.py \
+        --organization cctbx \
+        --project cctbx_project \
+        --definitions 4 \
+        --artifact-name phenix_regression \
+        --local-filename phenix_regression.zip
       unzip phenix_regression.zip
     displayName: Copy phenix_regression artifact
     retryCountOnTaskFailure: 3
