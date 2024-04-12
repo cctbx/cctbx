@@ -20,9 +20,6 @@ jobs:
 
   steps:
 
-  - checkout: self
-    path: ./cctbx
-
   # ubuntu setup
   - script: |
       sudo apt-get install -y build-essential curl git libgl1-mesa-dev libglu1-mesa-dev locales subversion
@@ -73,7 +70,7 @@ jobs:
       conda create -n test -y requests
       source activate test
       cd modules
-      python ../cctbx/scripts/download-azure-artifact.py \
+      python ../scripts/download-azure-artifact.py \
         --organization cctbx \
         --project cctbx_project \
         --definitions 4 \
