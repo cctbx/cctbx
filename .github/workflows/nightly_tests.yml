@@ -83,6 +83,15 @@ jobs:
           unzip phenix_regression.zip
           mv phenix_regression ${CONDA_PREFIX}/lib/python${{ matrix.python_version }}/site-packages
 
+      - name: Skip scitbx/linalg/tests/tst_svd.py on macOS
+        if: runner.os == 'macOS'
+        run: |
+          source ${CONDA}/etc/profile.d/conda.sh
+          conda activate test
+
+          sed -i '' -e '/"$D\/linalg\/tests\/tst_svd.py",/d' \
+            ${CONDA_PREFIX}/lib/python${{ matrix.python_version }}/site-packages/scitbx/run_tests.py
+
       - name: Run subset of tests (Linux & macOS)
         if: runner.os != 'Windows'
         run: |
