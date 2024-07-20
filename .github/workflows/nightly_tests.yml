@@ -20,7 +20,7 @@ jobs:
       matrix:
         channel: [cctbx-dev]
         os: [ubuntu-latest, macos-14, macos-13, windows-latest]
-        python_version: ["3.9", "3.10", "3.11"]
+        python_version: ["3.9", "3.10", "3.11", "3.12"]
         # os: [windows-latest]
         # python_version: [3.9, 3.12]
 
@@ -50,7 +50,7 @@ jobs:
 
       - name: Install cctbx
         run: |
-          conda install -n test -c ${{ matrix.channel }} -y cctbx numpy=1.25
+          conda install -n test -c ${{ matrix.channel }} -y cctbx numpy=1.26
 
       - name: Test environment info
         run: |
