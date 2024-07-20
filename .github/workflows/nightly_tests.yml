@@ -50,7 +50,7 @@ jobs:
 
       - name: Install cctbx
         run: |
-          conda install -n test -c ${{ matrix.channel }} -y cctbx numpy=1.26
+          conda install -n test -c ${{ matrix.channel }} -y cctbx numpy=2
 
       - name: Test environment info
         run: |
