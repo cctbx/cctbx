@@ -107,4 +107,4 @@ jobs:
 
       git push -u origin main
     displayName: Update and rerender nightly-feedstock
-    condition: eq(variables['Build.Reason'], 'ResourceTrigger')
+    # condition: eq(variables['Build.Reason'], 'ResourceTrigger')
