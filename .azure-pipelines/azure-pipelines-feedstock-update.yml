@@ -98,7 +98,7 @@ jobs:
 
       git commit -am "Update for v$(version)"
 
-      conda create -n smithy -c conda-forge -y conda-smithy conda-build=24.5
+      conda create -n smithy -c conda-forge -y conda-smithy
       source activate smithy
 
       conda smithy rerender -c auto
