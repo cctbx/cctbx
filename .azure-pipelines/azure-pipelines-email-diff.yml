@@ -41,7 +41,5 @@ steps:
     cd cctbx_project
     git remote add gitlab git@gitlab.com:cctbx/cctbx_project.git
     git fetch gitlab
-    git checkout -b gitlab_master gitlab/master
-    git reset --hard origin/master
-    git push -u gitlab gitlab_master
+    git push -u gitlab master
   displayName: Update GitLab copy
