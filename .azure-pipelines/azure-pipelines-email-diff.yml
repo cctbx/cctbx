@@ -5,12 +5,13 @@ trigger: none
 pr: none
 
 schedules:
-  - cron: '* /10 * * *'
+  - cron: '*/10 * * * *'
     displayName: Check for commits
     branches:
       include:
       - master
     always: true
+    batch: true
 
 resources:
   repositories:
