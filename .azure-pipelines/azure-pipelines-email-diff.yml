@@ -11,6 +11,7 @@ resources:
     name: cctbx/cctbx_project
     endpoint: cctbx
     trigger:
+      batch: true
       branches:
         include:
         - master
