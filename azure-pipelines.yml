@@ -101,7 +101,7 @@ jobs:
       set -xe
       cd build
       source setpaths.sh
-      libtbx.pip install junit-xml
+      libtbx.python -m pip install junit-xml
     displayName: Install junit-xml
 
   # test
