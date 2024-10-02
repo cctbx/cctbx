@@ -20,7 +20,7 @@ jobs:
       matrix:
         channel: [conda-forge, cctbx-nightly]
         os: [ubuntu-latest, macos-14, macos-13, windows-latest]
-        python_version: [3.8, 3.9, "3.10", 3.11, 3.12]
+        python_version: [3.9, "3.10", 3.11, 3.12]
         # os: [windows-latest]
         # python_version: [3.9, 3.12]
 
