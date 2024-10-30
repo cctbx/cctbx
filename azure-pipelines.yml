@@ -89,7 +89,7 @@ jobs:
   # base and build
   - script: |
       set -xe
-      python bootstrap.py base build --builder=cctbx --use-conda --python 38 --nproc=4
+      python bootstrap.py base build --builder=cctbx --use-conda --python 39 --nproc=4
       cd build
       source setpaths.sh
       libtbx.configure cma_es fable rstbx spotfinder cbflib_adaptbx phenix_regression phenix_examples
