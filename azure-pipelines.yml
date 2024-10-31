@@ -66,7 +66,9 @@ jobs:
 
   - script: |
       set -xe
-      conda remove -n test -y --all
+      if [ -d /usr/share/miniconda/envs/test ]; then
+        conda remove -n test -y --all
+      fi
       conda create -n test -y requests
       source activate test
       cd modules
