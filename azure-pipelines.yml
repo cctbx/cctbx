@@ -8,7 +8,7 @@ trigger:
 jobs:
 - job: Build_cctbx_source_tarball
   pool:
-    vmImage: ubuntu-20.04
+    vmImage: ubuntu-latest
   timeoutInMinutes: 120
 
   # variables for version
@@ -91,7 +91,12 @@ jobs:
   # base and build
   - script: |
       set -xe
-      python bootstrap.py base build --builder=cctbx --use-conda --python 38 --nproc=4
+      python bootstrap.py base build \
+        --builder=cctbx \
+        --use-conda \
+        --python 39 \
+        --config-flags="--cxxstd=c++14" \
+        --nproc=4
       cd build
       source setpaths.sh
       libtbx.configure cma_es fable rstbx spotfinder cbflib_adaptbx phenix_regression phenix_examples
