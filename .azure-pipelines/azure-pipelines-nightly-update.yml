@@ -70,7 +70,7 @@ jobs:
       git reset --hard origin/master
 
       cd modules
-      for module in annlib annlib_adaptbx boost ccp4io ccp4io_adaptbx \
+      for module in annlib annlib_adaptbx ccp4io ccp4io_adaptbx \
         cctbx_project clipper gui_resources tntbx; do
         cd ${module}
         git checkout master
@@ -85,8 +85,13 @@ jobs:
         cd ..
       done
 
+      cd boost
+      git checkout 1.86
+      git pull --rebase
+      cd ..
+
       cd dxtbx
-      git checkout dials-3.8
+      git checkout dials-3.22
       git pull --rebase
       cd ..
 
