@@ -5,7 +5,8 @@ requires = ["setuptools"]
 name = "cctbx-base"
 version = "2025.4"
 dependencies = ["matplotlib", "numpy", "six"]
-license = {file = "LICENSE.txt"}
+license = "BSD-3-Clause-LBNL AND BSD-3-Clause AND BSL-1.0 AND LGPL-2.0-only AND LGPL-2.1-only AND LGPL-3.0-only AND MIT AND LGPL-2.0-or-later WITH WxWindows-exception-3.1"
+license-files = ["LICEN[CS]E*.txt"]
 
 description = "The Computational Crystallography Toolbox (cctbx) is being developed as the open source component of the Phenix system. The goal of the Phenix project is to advance automation of macromolecular structure determination. Phenix depends on the cctbx, but not vice versa. This hierarchical approach enforces a clean design as a reusable library. The cctbx is therefore also useful for small-molecule crystallography and even general scientific applications."
 authors = [{name = "CCTBX developers"}]
@@ -18,10 +19,6 @@ classifiers = [
   'Development Status :: 5 - Production/Stable',
   'Intended Audience :: Science/Research',
   'Intended Audience :: Developers',
-  'License :: OSI Approved :: BSD License',
-  'License :: OSI Approved :: Boost Software License 1.0 (BSL-1.0)',
-  'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
-  'License :: OSI Approved :: MIT License',
   'Programming Language :: C++',
   'Programming Language :: Python',
   'Programming Language :: Python :: 3',
@@ -47,3 +44,6 @@ source = "https://github.com/cctbx/cctbx_project"
 download = "https://github.com/cctbx/cctbx_project/releases"
 tracker = "https://github.com/cctbx/cctbx_project/issues"
 "release notes" = "https://github.com/cctbx/cctbx_project/releases"
+
+[tool.setuptools]
+include-package-data = true

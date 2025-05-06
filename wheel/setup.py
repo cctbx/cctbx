@@ -1,12 +1,19 @@
 import os
+import shutil
+import sys
+
+from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
+from subprocess import check_output
 
 # =============================================================================
 class CCTBXExtension(Extension):
   def __init__(self, name, **kwargs):
     super().__init__(name, sources=[])
     self.__dict__.update(kwargs)
+    self.filename = name
+    self.name = ''
 
 # =============================================================================
 class BuildCCTBX(build_ext):
@@ -14,13 +21,48 @@ class BuildCCTBX(build_ext):
   def run(self):
     for extension in self.extensions:
       self.copy_extension(extension)
+      if sys.platform == 'darwin':
+        self.fix_rpaths(extension)
     super().run()
 
   def copy_extension(self, extension):
-    build_path = self.build_temp
+    shutil.copyfile(Path('.') / 'lib' / extension.filename,
+                    Path(self.build_lib) / extension.filename)
+
+  def fix_rpaths(self, extension):
+    file_path = Path(self.build_lib) / extension.filename
+    assert file_path.exists()
+
+    # get library links
+    otool_lines = check_output(['otool', '-L', file_path]).decode('utf8').split('\n')
+    print('Fixing', extension.filename)
+    print('='*79)
+    print('\n'.join(otool_lines))
+    print('-'*79)
+
+    # replace @rpath with CONDA_PREFIX
+    new_rpath = os.environ.get('CONDA_PREFIX', None)
+    assert new_rpath is not None
+    new_rpath = Path(new_rpath) / 'lib'
+    for line in otool_lines:
+      if line.strip().startswith('@rpath'):
+        rpath_line = line.split()[0]
+        library = rpath_line.split('/')[-1]
+        if library == extension.filename:
+          continue
+        new_lib = new_rpath / library
+        assert new_lib.exists()
+        print('\n'.join(check_output(['install_name_tool', '-change', rpath_line, new_lib, file_path])))
+
+    # check updated library links
+    print('-'*79)
+    otool_lines = check_output(['otool', '-L', file_path]).decode('utf8').split('\n')
+    print('\n'.join(otool_lines))
+    print('='*79)
+    print('\n')
 
 # =============================================================================
 if __name__ == '__main__':
-  ext_modules = []
+  ext_modules = [CCTBXExtension(Path(f).name) for f in os.listdir(Path('.') / 'lib')]
   setup(ext_modules=ext_modules,
         cmdclass={'build_ext' : BuildCCTBX},)
