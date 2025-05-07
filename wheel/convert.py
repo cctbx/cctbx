@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import shutil
@@ -122,5 +123,8 @@ def create_wheel(prefix_path):
 
 # =============================================================================
 if __name__ == '__main__':
-  # create_wheel('../cctbx-base-2025.4-py311h92c6074_0')
-  sys.exit(create_wheel('../cctbx-base-2025.4-py313h661d2d4_0'))
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--conda-package-path', type=str,
+                      help='The root directory of the extracted conda package.')
+  namespace = parser.parse_args()
+  sys.exit(create_wheel(namespace.conda_package_path))
