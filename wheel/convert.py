@@ -21,6 +21,16 @@ class CondaWheelConverter():
     self.bin_files = []
     self.lib_files = []
 
+    # files to exclude (binary files cannot be scripts)
+    self.excluded_files = [
+      'cctbx.sys_abs_equiv_space_groups',
+      'cctbx.convert_ccp4_symop_lib',
+      'cctbx.getting_started',
+      'cctbx.sym_equiv_sites',
+      'cctbx.lattice_symmetry',
+      'cctbx.find_distances',
+      ]
+
   # ---------------------------------------------------------------------------
   def copy_files(self, package_path):
     # load file metadata from conda package
@@ -85,7 +95,8 @@ class CondaWheelConverter():
     # ignore existing .egg-info and .dist-info directories
     if '__pycache__' in relative_path.parent.parts \
       or 'egg-info' in os.fspath(relative_path.parent) \
-      or 'dist-info' in os.fspath(relative_path.parent):
+      or 'dist-info' in os.fspath(relative_path.parent) \
+      or file_path.name in self.excluded_files:
       pass
     # copy all dispatchers in bin
     elif 'bin' in relative_path.parent.parts[0]:

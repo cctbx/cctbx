@@ -78,5 +78,7 @@ class BuildCCTBX(build_ext):
 # =============================================================================
 if __name__ == '__main__':
   ext_modules = [CCTBXExtension(Path(f).name) for f in os.listdir(Path('.') / 'lib')]
+  scripts = [str(os.path.join('.', 'bin', f)) for f in os.listdir(Path('.') / 'bin')]
   setup(ext_modules=ext_modules,
-        cmdclass={'build_ext' : BuildCCTBX},)
+        cmdclass={'build_ext' : BuildCCTBX},
+        scripts=scripts)
