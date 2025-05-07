@@ -22,37 +22,47 @@ class BuildCCTBX(build_ext):
     for extension in self.extensions:
       self.copy_extension(extension)
       if sys.platform == 'darwin':
-        self.fix_rpaths(extension)
+        self.fixed_dylib = []
+        self.fix_rpaths(extension.filename)
     super().run()
 
   def copy_extension(self, extension):
     shutil.copyfile(Path('.') / 'lib' / extension.filename,
                     Path(self.build_lib) / extension.filename)
 
-  def fix_rpaths(self, extension):
-    file_path = Path(self.build_lib) / extension.filename
+  def fix_rpaths(self, filename):
+    # replace @rpath with CONDA_PREFIX
+    new_rpath = os.environ.get('CONDA_PREFIX', None)
+    assert new_rpath is not None, 'The conda environment must be active.'
+    new_rpath = Path(new_rpath) / 'lib'
+
+    if filename.endswith('dylib'):
+      file_path = new_rpath /filename
+    else:
+      file_path = Path(self.build_lib) / filename
     assert file_path.exists()
 
     # get library links
     otool_lines = check_output(['otool', '-L', file_path]).decode('utf8').split('\n')
-    print('Fixing', extension.filename)
+    print('Fixing', filename)
     print('='*79)
     print('\n'.join(otool_lines))
     print('-'*79)
 
-    # replace @rpath with CONDA_PREFIX
-    new_rpath = os.environ.get('CONDA_PREFIX', None)
-    assert new_rpath is not None
-    new_rpath = Path(new_rpath) / 'lib'
     for line in otool_lines:
       if line.strip().startswith('@rpath'):
         rpath_line = line.split()[0]
         library = rpath_line.split('/')[-1]
-        if library == extension.filename:
+        if library == filename:
           continue
         new_lib = new_rpath / library
         assert new_lib.exists()
-        print('\n'.join(check_output(['install_name_tool', '-change', rpath_line, new_lib, file_path])))
+        output = check_output(['install_name_tool', '-change', rpath_line, new_lib, file_path])
+        print('\n'.join(output))
+        if library.endswith('dylib') and library not in self.fixed_dylib:
+          self.fix_rpaths(library)
+          self.fixed_dylib.append(library)
+          print(self.fixed_dylib)
 
     # check updated library links
     print('-'*79)
@@ -60,6 +70,10 @@ class BuildCCTBX(build_ext):
     print('\n'.join(otool_lines))
     print('='*79)
     print('\n')
+
+    # sign file
+    output = check_output(['codesign', '--continue', '-s', '-', '-f', file_path]).decode('utf8').split('\n')
+    print('\n'.join(output))
 
 # =============================================================================
 if __name__ == '__main__':
