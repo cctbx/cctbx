@@ -10,10 +10,10 @@ from subprocess import check_output
 # =============================================================================
 class CCTBXExtension(Extension):
   def __init__(self, name, **kwargs):
-    super().__init__(name, sources=[])
+    super().__init__(name, sources=['dummy.c'])
     self.__dict__.update(kwargs)
     self.filename = name
-    self.name = ''
+    self.name = 'dummy'
 
 # =============================================================================
 class BuildCCTBX(build_ext):
