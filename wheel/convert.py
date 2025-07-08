@@ -118,7 +118,7 @@ class CondaWheelConverter():
       if 'Library' in relative_path.parent.parts:
         library_path = Path(os.fspath(file_path).split('Library')[-1][1:])
         library_parts = library_path.parent.parts[0]
-        if 'bin' in library_parts:
+        if 'bin' in library_parts and not library_path.name.endswith('.exe'):
           dest = self.bin_path / library_path.name
           self.bin_files.append(dest)
         elif 'share' in library_parts \
