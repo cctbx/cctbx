@@ -113,6 +113,34 @@ class CondaWheelConverter():
     elif relative_path.suffix == '.so':
       dest = (self.lib_path / relative_path.name).resolve()
       self.lib_files.append(dest)
+    # Windows
+    elif sys.platform == 'win32':
+      if 'Library' in relative_path.parent.parts:
+        library_path = Path(os.fspath(file_path).split('Library')[-1][1:])
+        library_parts = library_path.parent.parts[0]
+        if 'bin' in library_parts:
+          dest = self.bin_path / library_path.name
+          self.bin_files.append(dest)
+        elif 'share' in library_parts \
+          or 'include' in library_parts:
+          dest = (self.core_path / library_path)
+          self.src_files.append(dest)
+        elif 'lib' in library_parts:
+          dest = (self.lib_path / library_path.name).resolve()
+          self.lib_files.append(dest)
+      elif 'Lib' in relative_path.parent.parts:
+        library_path = Path(os.fspath(file_path).split('Lib')[-1][1:])
+        if '__pycache__' in library_path.parent.parts \
+          or 'egg-info' in os.fspath(library_path.parent) \
+          or 'dist-info' in os.fspath(library_path.parent) \
+          or file_path.name in self.excluded_files:
+          pass
+        elif 'site-packages' in relative_path.parent.parts:
+          dest = (self.src_path / Path(os.fspath(file_path).split('site-packages')[-1][1:])).resolve()
+          self.src_files.append(dest)
+        else:
+          dest = (self.lib_path / library_path)
+          self.lib_files.append(dest)
 
     if dest is not None:
       os.makedirs(dest.parent, exist_ok=True)
@@ -125,6 +153,9 @@ class CondaWheelConverter():
     ''')
       return True
     else:
+      print(f'''\
+    Ignoring {file_path}\
+    ''')
       return False
 
 # =============================================================================
