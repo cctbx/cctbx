@@ -48,7 +48,7 @@ jobs:
 
           if [[ "`uname`" == "Darwin" ]]; then
             conda install delocate
-          elif
+          else
             conda install auditwheel
           fi
 
@@ -82,7 +82,7 @@ jobs:
           if [[ "`uname`" == "Darwin" ]]; then
             delocate-wheel -w fixed_wheels -v ./wheels/cctbx-base*.whl
             ls fixed_wheels
-          elif
+          else
             auditwheel repair ./wheels/cctbx-base*.whl
             ls wheels
           fi
