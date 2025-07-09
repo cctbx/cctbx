@@ -58,7 +58,7 @@ jobs:
 
           conda remove --force -n test cctbx-base
 
-          python convert.py --conda-package-path ${CONDA}/pkgs/cctbx-base*.conda
+          python convert.py --conda-package-path ${CONDA}/pkgs/cctbx-base*
 
       - name: Build unix wheel (Linux & macOS)
         if: runner.os != 'Windows'
@@ -102,7 +102,7 @@ jobs:
 
           conda remove --force -n test cctbx-base
 
-          python convert.py --conda-package-path %CONDA%\pkgs\cctbx-base*.conda
+          python convert.py --conda-package-path %CONDA%\pkgs\cctbx-base*
 
       - name: Build Windows wheel
         if: runner.os == 'Windows'
