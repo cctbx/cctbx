@@ -17,7 +17,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description=__doc__)
 
   parser.add_argument('--filename', default='pyproject.toml', type=str,
-    help='The file to be patched', required=True)
+    help='The file to be patched')
   parser.add_argument('--version', default=None, type=str,
     help='The version', required=True)
 
