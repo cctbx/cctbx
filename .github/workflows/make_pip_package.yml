@@ -33,7 +33,6 @@ jobs:
       - name: Install cctbx
         run: |
           conda install -n test -c ${{ matrix.channel }} -y cctbx-base
-          conda remove --force -n test cctbx-base
 
       - name: Test environment info
         run: |
@@ -56,6 +55,8 @@ jobs:
 
           version=`cat ${CONDA_PREFIX}/share/cctbx/cctbx_version.txt`
           python update_version.py --version=${version}
+
+          conda remove --force -n test cctbx-base
 
           python convert.py --conda-package-path ${CONDA}/pkgs/cctbx-base*.conda
 
@@ -98,6 +99,8 @@ jobs:
 
           set /p version= %CONDA_PREFIX%\share\cctbx\cctbx_version.txt
           python update_version.py --version=%version%
+
+          conda remove --force -n test cctbx-base
 
           python convert.py --conda-package-path %CONDA%\pkgs\cctbx-base*.conda
 
