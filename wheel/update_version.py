@@ -2,6 +2,7 @@
 Script for updating the version in pyproject.toml
 """
 import argparse
+import os
 
 def update_version(filename, version):
   with open(filename, 'r') as f:

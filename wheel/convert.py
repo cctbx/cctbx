@@ -172,4 +172,5 @@ if __name__ == '__main__':
                       help='The root directory of the extracted conda package.',
                       required=True)
   namespace = parser.parse_args()
-  sys.exit(create_wheel(namespace.conda_package_path))
+  result = create_wheel(namespace.conda_package_path)
+  assert result

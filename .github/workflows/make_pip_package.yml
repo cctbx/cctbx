@@ -45,20 +45,16 @@ jobs:
           source ${CONDA}/etc/profile.d/conda.sh
           conda activate test
 
-          if [[ "`uname`" == "Darwin" ]]; then
-            conda install delocate
-          else
-            conda install auditwheel
-          fi
-
           cd cctbx/wheel
 
           version=`cat ${CONDA_PREFIX}/share/cctbx/cctbx_version.txt`
           python update_version.py --version=${version}
 
-          conda remove --force -n test cctbx-base
+          rm -f ${HOME}/conda_pkgs_dir/cctbx-base*.conda
 
-          python convert.py --conda-package-path ${CONDA}/pkgs/cctbx-base*
+          python convert.py --conda-package-path ${HOME}/conda_pkgs_dir/cctbx-base*
+
+          ls
 
       - name: Build unix wheel (Linux & macOS)
         if: runner.os != 'Windows'
@@ -81,31 +77,45 @@ jobs:
           cd cctbx/wheel
 
           if [[ "`uname`" == "Darwin" ]]; then
-            delocate-wheel -w fixed_wheels -v ./wheels/cctbx-base*.whl
+            conda install -y delocate
+            delocate-wheel -w fixed_wheels -v ./wheels/cctbx?base*.whl
             ls fixed_wheels
           else
-            auditwheel repair ./wheels/cctbx-base*.whl
-            ls wheels
+            conda install -y auditwheel
+            export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
+            auditwheel repair -w fixed_wheels ./wheels/cctbx?base*.whl
+            ls fixed_wheels
           fi
 
       # Windows path
       - name: Create Windows package
         if: runner.os == 'Windows'
+        shell: cmd
         run: |
           call %CONDA%\Scripts\activate test
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
 
           cd cctbx\wheel
 
-          set /p version= %CONDA_PREFIX%\share\cctbx\cctbx_version.txt
+          set /p version=<"%CONDA_PREFIX%\Library\share\cctbx\cctbx_version.txt"
           python update_version.py --version=%version%
+          if %ERRORLEVEL% neq 0 exit 1
 
-          conda remove --force -n test cctbx-base
+          more pyproject.toml
 
-          python convert.py --conda-package-path %CONDA%\pkgs\cctbx-base*
+          del /s /q %USERPROFILE%\conda_pkgs_dir\cctbx-base*.conda
+
+          for /D %%d in ("%USERPROFILE%\conda_pkgs_dir\cctbx-base*") do (
+            echo %%d
+            python convert.py --conda-package-path %%d
+            if %ERRORLEVEL% neq 0 exit 1
+          )
+
+          dir
 
       - name: Build Windows wheel
         if: runner.os == 'Windows'
+        shell: cmd
         run: |
           call %CONDA%\Scripts\activate test
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
@@ -113,17 +123,31 @@ jobs:
           cd cctbx\wheel
 
           pip wheel . -w .\wheels
+          if %ERRORLEVEL% neq 0 exit 1
 
           dir wheels
 
       - name: Fix Windows wheel
         if: runner.os == 'Windows'
+        shell: cmd
         run: |
           call %CONDA%\Scripts\activate test
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
 
           cd cctbx\wheel
 
-          delvewheel repair -v -w fixed_wheels .\wheels\cctbx-base*.whl
+          call conda install -y delvewheel
+
+          for %%f in (".\wheels\cctbx?base*.whl") do (
+            echo %%f
+            delvewheel repair -v -w fixed_wheels %%f
+            if %ERRORLEVEL% neq 0 exit 1
+          )
 
           dir fixed_wheels
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}_${{ matrix.python_version }}
+          path: ./cctbx/wheel/fixed_wheels/cctbx?base*.whl
+          overwrite: true
