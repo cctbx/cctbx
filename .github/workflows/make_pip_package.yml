@@ -46,7 +46,7 @@ jobs:
           source ${CONDA}/etc/profile.d/conda.sh
           conda activate test
 
-          if [[ "`uname`" == "Darwin" ]]; do
+          if [[ "`uname`" == "Darwin" ]]; then
             conda install delocate
           elif
             conda install auditwheel
@@ -79,7 +79,7 @@ jobs:
 
           cd cctbx/wheel
 
-          if [[ "`uname`" == "Darwin" ]]; do
+          if [[ "`uname`" == "Darwin" ]]; then
             delocate-wheel -w fixed_wheels -v ./wheels/cctbx-base*.whl
             ls fixed_wheels
           elif
