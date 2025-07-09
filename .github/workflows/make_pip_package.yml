@@ -50,7 +50,7 @@ jobs:
             conda install delocate
           elif
             conda install auditwheel
-          done
+          fi
 
           cd cctbx/wheel
 
@@ -85,7 +85,7 @@ jobs:
           elif
             auditwheel repair ./wheels/cctbx-base*.whl
             ls wheels
-          done
+          fi
 
       # Windows path
       - name: Create Windows package
@@ -96,7 +96,7 @@ jobs:
 
           cd cctbx\wheel
 
-          set /p version= <%CONDA_PREFIX%\share\cctbx\cctbx_version.txt
+          set /p version= %CONDA_PREFIX%\share\cctbx\cctbx_version.txt
           python update_version.py --version=%version%
 
           python convert.py --conda-package-path %CONDA%\pkgs\cctbx-base*.conda
