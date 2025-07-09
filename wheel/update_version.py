@@ -1,0 +1,26 @@
+"""
+Script for updating the version in pyproject.toml
+"""
+import argparse
+
+def update_version(filename, version):
+  with open(filename, 'r') as f:
+    lines = f.readlines()
+
+  with open(filename, 'w') as f:
+    for line in lines:
+      if 'REPLACEME' in line:
+        line = f'version = "{version}"\n'
+      f.write(line)
+
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(description=__doc__)
+
+  parser.add_argument('--filename', default='pyproject.toml', type=str,
+    help='The file to be patched', required=True)
+  parser.add_argument('--version', default=None, type=str,
+    help='The version', required=True)
+
+  namespace = parser.parse_args()
+
+  update_version(filename=namespace.filename, version=namespace.version)
