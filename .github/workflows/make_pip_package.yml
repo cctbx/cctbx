@@ -78,7 +78,7 @@ jobs:
 
           if [[ "`uname`" == "Darwin" ]]; then
             conda install -y delocate
-            delocate-wheel -w fixed_wheels -v ./wheels/cctbx?base*.whl
+            delocate-wheel -w fixed_wheels -v ./wheels/cctbx?base*.whl -e libtbx/core/share/cctbx
             ls fixed_wheels
           else
             conda install -y auditwheel

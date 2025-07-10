@@ -163,6 +163,10 @@ def create_wheel(prefix_path):
   converter = CondaWheelConverter()
   result = converter.copy_files(prefix_path)
 
+  # add __init__.py to libtbx/core/share/cctbx so that it is included
+  new_file = converter.core_path / 'share' / 'cctbx' / '__init__.py'
+  new_file.touch()
+
   return result
 
 # =============================================================================
