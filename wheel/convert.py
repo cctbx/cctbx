@@ -167,6 +167,19 @@ def create_wheel(prefix_path):
   new_file = converter.core_path / 'share' / 'cctbx' / '__init__.py'
   new_file.touch()
 
+  # fix macOS dispatchers to remove python.app
+  if sys.platform == 'darwin':
+    original = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/python.app/Contents/MacOS/$LIBTBX_PYEXE_BASENAME"'
+    patched = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/bin/$LIBTBX_PYEXE_BASENAME"\n'
+    for dispatcher in converter.bin_path.iterdir():
+      with open(dispatcher, 'r') as f:
+        lines = f.readlines()
+      with open(dispatcher, 'w') as f:
+        for line in lines:
+          if original in line:
+            line = patched
+          f.write(line)
+
   return result
 
 # =============================================================================
