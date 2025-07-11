@@ -1,6 +1,9 @@
 # Convert conda package to pip package
 name: Convert conda to pip
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'
 
 jobs:
   convert_conda_packages:
@@ -186,7 +189,10 @@ jobs:
 
       - name: Test (Linux & macOS)
         if: runner.os != 'Windows'
-        run: libtbx.run_tests_parallel module=cctbx nproc=4
+        run: |
+          mkdir test
+          cd test
+          libtbx.run_tests_parallel module=cctbx module=libtbx nproc=4
 
       - name: Test (Windows)
         if: runner.os == 'Windows'

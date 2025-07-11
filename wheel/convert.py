@@ -145,6 +145,7 @@ class CondaWheelConverter():
     if dest is not None:
       os.makedirs(dest.parent, exist_ok=True)
       shutil.copyfile(file_path, dest)
+      shutil.copymode(file_path, dest)
       if dest in self.bin_files:
         os.chmod(dest, 0o755)
       print(f'''\
