@@ -103,10 +103,6 @@ jobs:
 
       conda smithy rerender -c auto
 
-      # skip Windows environment artifact storage
-      sed -i "s/condition: not(eq(variables.ENV_ARTIFACT_PATH, ''))/condition: false/g" .azure-pipelines/azure-pipelines-win.yml
-      git commit -am "Skip Windows environment artifact"
-
       git remote set-url origin git@github.com:cctbx/nightly-feedstock.git
 
       git push -u origin main
