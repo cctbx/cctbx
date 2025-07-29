@@ -45,5 +45,8 @@ download = "https://github.com/cctbx/cctbx_project/releases"
 tracker = "https://github.com/cctbx/cctbx_project/issues"
 "release notes" = "https://github.com/cctbx/cctbx_project/releases"
 
+[project.entry-points."pytest_randomly.random_seeder"]
+scitbx_flex = "scitbx.array_family.flex:set_random_seed"
+
 [tool.setuptools]
 include-package-data = true
