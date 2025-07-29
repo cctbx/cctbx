@@ -5,6 +5,7 @@ import shutil
 import sys
 
 from pathlib import Path
+from subprocess import check_output
 
 # =============================================================================
 class CondaWheelConverter():
@@ -12,17 +13,18 @@ class CondaWheelConverter():
 
     # python package locations
     self.src_path = (Path('.') / 'src').resolve()
-    self.bin_path = (Path('.') / 'bin').resolve()
-    self.lib_path = (Path('.') / 'lib').resolve()
-    self.core_path = (self.src_path / 'libtbx' / 'core').resolve()
+    self.bin_path = (Path('.') / 'bin').resolve()  # regular dispatchers
+    self.lib_path = (Path('.') / 'lib').resolve()  # libraries
+    self.core_path = (self.src_path / 'libtbx' / 'core').resolve()  # share
+    self.entry_point_path = (self.src_path / 'libtbx' / 'core' / 'dispatchers').resolve()  # binaries or dispatchers on Windows
 
     # copied files
     self.src_files = []
     self.bin_files = []
     self.lib_files = []
 
-    # files to exclude (binary files cannot be scripts)
-    self.excluded_files = [
+    # binary files cannot be scripts, so they will be wrapped as entry points
+    self.binary_files = [
       'cctbx.sys_abs_equiv_space_groups',
       'cctbx.convert_ccp4_symop_lib',
       'cctbx.getting_started',
@@ -30,6 +32,9 @@ class CondaWheelConverter():
       'cctbx.lattice_symmetry',
       'cctbx.find_distances',
       ]
+
+    # for self.fix_rpaths
+    self.fixed_dylib = []
 
   # ---------------------------------------------------------------------------
   def copy_files(self, package_path):
@@ -53,11 +58,6 @@ class CondaWheelConverter():
       assert file_list[i].strip() == paths_file_list[i].strip(), \
         (file_list[i].strip(), paths_file_list[i].strip())
 
-    # create directories
-    # os.makedirs(self.src_path, exist_ok=True)
-    # os.makedirs(self.bin_path, exist_ok=True)
-    # os.makedirs(self.core_path, exist_ok=True)
-
     # counters
     n_ignored = 0
     n_copied = 0
@@ -72,6 +72,15 @@ class CondaWheelConverter():
     n_processed = n_copied + n_ignored
 
     assert n_copied == len(self.bin_files) + len(self.lib_files) + len(self.src_files)
+
+    # fix rpaths on macOS
+    if sys.platform == 'darwin':
+      for extension in self.lib_files:
+        self.fixed_dylib = []
+        self.fix_rpaths(extension.name)
+      for binary in self.bin_files:
+        if binary.name in self.binary_files:
+          self.fix_rpaths(binary.name)
 
     # summary
     print()
@@ -95,9 +104,11 @@ class CondaWheelConverter():
     # ignore existing .egg-info and .dist-info directories
     if '__pycache__' in relative_path.parent.parts \
       or 'egg-info' in os.fspath(relative_path.parent) \
-      or 'dist-info' in os.fspath(relative_path.parent) \
-      or file_path.name in self.excluded_files:
+      or 'dist-info' in os.fspath(relative_path.parent):
       pass
+    elif file_path.name in self.binary_files:
+      dest = (self.entry_point_path / file_path.name)
+      self.bin_files.append(dest)
     # copy all dispatchers in bin
     elif 'bin' in relative_path.parent.parts[0]:
       dest = self.bin_path / relative_path.name
@@ -132,9 +143,11 @@ class CondaWheelConverter():
         library_path = Path(os.fspath(file_path).split('Lib')[-1][1:])
         if '__pycache__' in library_path.parent.parts \
           or 'egg-info' in os.fspath(library_path.parent) \
-          or 'dist-info' in os.fspath(library_path.parent) \
-          or file_path.name in self.excluded_files:
+          or 'dist-info' in os.fspath(library_path.parent):
           pass
+        elif file_path.name in self.binary_files:
+          dest = (self.entry_point_path / file_path.name)
+          self.bin_files.append(dest)
         elif 'site-packages' in relative_path.parent.parts:
           dest = (self.src_path / Path(os.fspath(file_path).split('site-packages')[-1][1:])).resolve()
           self.src_files.append(dest)
@@ -159,27 +172,73 @@ class CondaWheelConverter():
     ''')
       return False
 
+  # ---------------------------------------------------------------------------
+  def fix_rpaths(self, filename):
+
+    # replace @rpath with CONDA_PREFIX
+    new_rpath = os.environ.get('CONDA_PREFIX', None)
+    assert new_rpath is not None, 'The conda environment must be active.'
+    new_rpath = Path(new_rpath) / 'lib'
+
+    if filename.endswith('dylib'):
+      file_path = new_rpath / filename
+    else:
+      file_path = Path(self.lib_path) / filename
+    if not file_path.exists():
+      file_path = Path(self.entry_point_path) / filename
+    assert file_path.exists(), file_path
+
+    # get library links
+    otool_lines = check_output(['otool', '-L', file_path]).decode('utf8').split('\n')
+    print('Fixing', filename)
+    print('='*79)
+    print('\n'.join(otool_lines))
+    print('-'*79)
+
+    for line in otool_lines:
+      if line.strip().startswith('@rpath'):
+        rpath_line = line.split()[0]
+        library = rpath_line.split('/')[-1]
+        if library == filename:
+          continue
+        new_lib = new_rpath / library
+        assert new_lib.exists(), new_lib
+        output = check_output(['install_name_tool', '-change', rpath_line, new_lib, file_path])
+        print('\n'.join(output))
+        if library.endswith('dylib') and library not in self.fixed_dylib:
+          self.fix_rpaths(library)
+          self.fixed_dylib.append(library)
+          print(self.fixed_dylib)
+
+    # check updated library links
+    print('-'*79)
+    otool_lines = check_output(['otool', '-L', file_path]).decode('utf8').split('\n')
+    print('\n'.join(otool_lines))
+    print('='*79)
+    print('\n')
+
+    # sign file
+    output = check_output(['codesign', '--continue', '-s', '-', '-f', file_path]).decode('utf8').split('\n')
+    print('\n'.join(output))
+
 # =============================================================================
 def create_wheel(prefix_path):
   converter = CondaWheelConverter()
   result = converter.copy_files(prefix_path)
-
-  # add __init__.py to libtbx/core/share/cctbx so that it is included
-  new_file = converter.core_path / 'share' / 'cctbx' / '__init__.py'
-  new_file.touch()
 
   # fix macOS dispatchers to remove python.app
   if sys.platform == 'darwin':
     original = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/python.app/Contents/MacOS/$LIBTBX_PYEXE_BASENAME"'
     patched = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/bin/$LIBTBX_PYEXE_BASENAME"\n'
     for dispatcher in converter.bin_path.iterdir():
-      with open(dispatcher, 'r') as f:
-        lines = f.readlines()
-      with open(dispatcher, 'w') as f:
-        for line in lines:
-          if original in line:
-            line = patched
-          f.write(line)
+      if dispatcher.name not in converter.binary_files:
+        with open(dispatcher, 'r') as f:
+          lines = f.readlines()
+        with open(dispatcher, 'w') as f:
+          for line in lines:
+            if original in line:
+              line = patched
+            f.write(line)
 
   return result
 
