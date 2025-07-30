@@ -19,6 +19,17 @@ class CondaWheelConverter():
     self.core_path = (self.src_path / 'libtbx' / 'core').resolve()  # share
     self.entry_point_path = (self.src_path / 'libtbx' / 'core' / 'dispatchers').resolve()  # binaries or dispatchers on Windows
 
+    # create directories
+    os.makedirs(self.src_path, exist_ok=True)
+    os.makedirs(self.bin_path, exist_ok=True)
+    os.makedirs(self.lib_path, exist_ok=True)
+    os.makedirs(self.core_path, exist_ok=True)
+    os.makedirs(self.entry_point_path, exist_ok=True)
+
+    # create __init__.py
+    (Path(self.entry_point_path) / '__init__.py').touch()
+    (Path(self.entry_point_path.parent) / '__init__.py').touch()
+
     # copied files
     self.src_files = []
     self.bin_files = []
@@ -39,6 +50,24 @@ class CondaWheelConverter():
 
     # for self.fix_rpaths
     self.fixed_dylib = []
+
+    # template for entry point for running dispatchers/executables
+    self.entry_point_template =  '''\
+import os
+import subprocess
+import sys
+
+from pathlib import Path
+
+def run_command():
+  import libtbx.core.dispatchers
+  executable = Path(libtbx.core.dispatchers.__file__).parent / '{dispatcher_name}'
+
+  if sys.platform == 'win32':
+    raise SystemExit(subprocess.call([executable, *sys.argv[1:]], close_fds=False))
+  else:
+    os.execl(executable, *sys.argv[1:])
+'''
 
   # ---------------------------------------------------------------------------
   def copy_files(self, package_path):
@@ -95,8 +124,9 @@ class CondaWheelConverter():
       if not os.path.isdir(binary):
         self.shared_binary_files.append(binary)
 
-    # fix rpaths on macOS
+    # macOS specific fixes
     if sys.platform == 'darwin':
+      # fix rpaths on macOS
       print('='*79)
       print('Fixing RPATH')
       print('='*79)
@@ -109,22 +139,76 @@ class CondaWheelConverter():
       for binary in self.shared_binary_files:
         self.fix_rpaths(binary)
 
-    # fix macOS dispatchers to remove python.app
-    if sys.platform == 'darwin':
+      # fix macOS dispatchers to remove python.app
       print('='*79)
       print('Removing python.app')
       print('='*79)
       original = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/python.app/Contents/MacOS/$LIBTBX_PYEXE_BASENAME"'
       patched = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/bin/$LIBTBX_PYEXE_BASENAME"\n'
       for dispatcher in self.bin_path.iterdir():
-        if dispatcher.name not in self.binary_files:
+        with open(dispatcher, 'r') as f:
+          lines = f.readlines()
+        with open(dispatcher, 'w') as f:
+          for line in lines:
+            if original in line:
+              line = patched
+            f.write(line)
+
+    # Windows specific fixes
+    if sys.platform == 'win32':
+      for dispatcher in self.entry_point_path.iterdir():
+        if dispatcher.suffix == '.bat':
           with open(dispatcher, 'r') as f:
             lines = f.readlines()
           with open(dispatcher, 'w') as f:
             for line in lines:
-              if original in line:
-                line = patched
-              f.write(line)
+              # correct python must already be in PATH
+              if r'@set LIBTBX_PYEXE=%LIBTBX_PREFIX%\..\python.exe' in line:
+                line = '@set LIBTBX_PYEXE=python.exe'
+              # simplify batch file path
+              elif r'@"%LIBTBX_PYEXE%" "%LIBTBX_PREFIX%\..\lib\site-packages' in line:
+                python_file = line.split('site-packages')[-1]
+                line = r'@"%LIBTBX_PYEXE%" "%~dp0\..\..\..{python_file}" %*'.format(python_file=python_file)
+              # do not change PATH
+              elif 'PATH=' in line:
+                continue
+              f.write(line.strip())
+              f.write('\n')
+
+    # add entry points for some commands
+    dispatchers = list(self.entry_point_path.iterdir())
+    for dispatcher in dispatchers:
+      # ignore __init__.py
+      if dispatcher.name == '__init__.py':
+        dispatchers.remove(dispatcher)
+        continue
+      # import modules cannot have .
+      dispatcher_import = dispatcher.stem.replace('.', '_')
+      if dispatcher.name in self.binary_files:
+        dispatcher_import = dispatcher.name.replace('.', '_')
+      entry_point_file = self.entry_point_path /  (dispatcher_import + '.py')
+      entry_point = self.entry_point_template.format(dispatcher_name=dispatcher.name)
+      with open(entry_point_file, 'w') as f:
+        f.write(entry_point)
+
+    # update pyproject.toml with entry points
+    with open('pyproject.toml', 'r') as f:
+      lines = f.readlines()
+
+    with open('pyproject.toml', 'w') as f:
+      for line in lines:
+        if 'INSERT_SCRIPTS_HERE' in line:
+          for dispatcher in dispatchers:
+            dispatcher_stem = dispatcher.stem
+            if dispatcher.name in self.binary_files:
+              dispatcher_stem = dispatcher.name
+            dispatcher_import = dispatcher_stem.replace('.', '_')
+            line = f'"{dispatcher_stem}" = "libtbx.core.dispatchers.{dispatcher_import}:run_command"'
+            f.write(line)
+            f.write('\n')
+          f.write('\n')
+        else:
+          f.write(line)
 
     # summary
     print()
@@ -174,7 +258,7 @@ class CondaWheelConverter():
         library_path = Path(os.fspath(file_path).split('Library')[-1][1:])
         library_parts = library_path.parent.parts[0]
         if 'bin' in library_parts and not library_path.name.endswith('.exe'):
-          dest = self.bin_path / library_path.name
+          dest = self.entry_point_path / library_path.name
           self.bin_files.append(dest)
         elif 'share' in library_parts \
           or 'include' in library_parts:

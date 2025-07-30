@@ -48,5 +48,8 @@ tracker = "https://github.com/cctbx/cctbx_project/issues"
 [project.entry-points."pytest_randomly.random_seeder"]
 scitbx_flex = "scitbx.array_family.flex:set_random_seed"
 
+[project.scripts]
+INSERT_SCRIPTS_HERE
+
 [tool.setuptools]
 include-package-data = true

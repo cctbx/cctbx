@@ -12,7 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         channel: [cctbx-nightly]
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
+        # os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
+        os: [windows-latest]
         python_version: [3.9, "3.10", 3.11, 3.12, 3.13]
 
     name: Converting (${{ matrix.channel }}, ${{ matrix.os }}, Python ${{ matrix.python_version }})
@@ -24,7 +25,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: test
+          conda-remove-defaults: true
           miniforge-version: latest
           python-version: ${{ matrix.python_version }}
 
@@ -35,7 +36,7 @@ jobs:
 
       - name: Install cctbx
         run: |
-          conda install -n test -c ${{ matrix.channel }} -y cctbx-base
+          conda install -n test -c ${{ matrix.channel }} -y cctbx-base python=${{ matrix.python_version }}
 
       - name: Test environment info
         run: |
@@ -56,6 +57,8 @@ jobs:
           rm -f ${HOME}/conda_pkgs_dir/cctbx-base*.conda
 
           python convert.py --conda-package-path ${HOME}/conda_pkgs_dir/cctbx-base*
+
+          cat pyproject.toml
 
           ls
 
@@ -104,8 +107,6 @@ jobs:
           python update_version.py --version=%version%
           if %ERRORLEVEL% neq 0 exit 1
 
-          more pyproject.toml
-
           del /s /q %USERPROFILE%\conda_pkgs_dir\cctbx-base*.conda
 
           for /D %%d in ("%USERPROFILE%\conda_pkgs_dir\cctbx-base*") do (
@@ -113,6 +114,8 @@ jobs:
             python convert.py --conda-package-path %%d
             if %ERRORLEVEL% neq 0 exit 1
           )
+
+          more pyproject.toml
 
           dir
 
@@ -161,7 +164,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
+        # os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
+        os: [windows-latest]
         python_version: [3.9, "3.10", 3.11, 3.12, 3.13]
 
     name: Testing (${{ matrix.os }}, Python ${{ matrix.python_version }})
@@ -177,14 +181,14 @@ jobs:
 
       - name: Install pip package (Linux & macOS)
         if: runner.os != 'Windows'
-        run: pip install cctbx*.whl
+        run: pip install -vvv cctbx*.whl
 
       - name: Install pip package (Windows)
         if: runner.os == 'Windows'
         shell: cmd
         run: |
           for %%f in (".\cctbx*.whl") do (
-            pip install %%f
+            pip install -vvv %%f
           )
 
       - name: Test (Linux & macOS)
@@ -196,4 +200,22 @@ jobs:
 
       - name: Test (Windows)
         if: runner.os == 'Windows'
-        run: python -c "from scitbx.array_family import flex; d = flex.random_double(500); print(flex.mean(d))"
+        shell: cmd
+        run: |
+          python -m site
+          python -c "import libtbx; from pathlib import Path; print(Path(libtbx.__file__).parent.parent)" > sp_dir.txt
+          set /p sp_dir=<".\sp_dir.txt"
+          more %sp_dir%\libtbx\core\dispatchers\libtbx.run_tests_parallel.bat
+          more %sp_dir%\libtbx\core\dispatchers\libtbx_run_tests_parallel.py
+          more %sp_dir%\libtbx\core\dispatchers\libtbx.python.bat
+          more %sp_dir%\libtbx\core\dispatchers\libtbx_python.py
+          python -c "from importlib.metadata import entry_points; eps = entry_points(); cs = eps['console_scripts']; print(cs)"
+          python -c "import sysconfig; print(sysconfig.get_path('scripts'))" > script_dir.txt
+          set /p script_dir=<".\script_dir.txt"
+          dir %script_dir%
+
+          mkdir test
+          cd test
+          REM libtbx.python --version
+          REM libtbx.run_tests_parallel module=cctbx module=libtbx module=scitbx module=smtbx nproc=4
+          python -c "from scitbx.array_family import flex; d = flex.random_double(500); print(flex.mean(d))"
