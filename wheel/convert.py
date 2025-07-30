@@ -42,6 +42,10 @@ class CondaWheelConverter():
 
   # ---------------------------------------------------------------------------
   def copy_files(self, package_path):
+    print('='*79)
+    print('Copying files')
+    print('='*79)
+
     # load file metadata from conda package
     package_path = Path(package_path)
     with (package_path / 'info' / 'files').open() as f:
@@ -91,10 +95,11 @@ class CondaWheelConverter():
       if not os.path.isdir(binary):
         self.shared_binary_files.append(binary)
 
-    print(self.shared_binary_files)
-
     # fix rpaths on macOS
     if sys.platform == 'darwin':
+      print('='*79)
+      print('Fixing RPATH')
+      print('='*79)
       for extension in self.lib_files:
         self.fixed_dylib = []
         self.fix_rpaths(extension.name)
@@ -103,6 +108,23 @@ class CondaWheelConverter():
           self.fix_rpaths(binary.name)
       for binary in self.shared_binary_files:
         self.fix_rpaths(binary)
+
+    # fix macOS dispatchers to remove python.app
+    if sys.platform == 'darwin':
+      print('='*79)
+      print('Removing python.app')
+      print('='*79)
+      original = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/python.app/Contents/MacOS/$LIBTBX_PYEXE_BASENAME"'
+      patched = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/bin/$LIBTBX_PYEXE_BASENAME"\n'
+      for dispatcher in self.bin_path.iterdir():
+        if dispatcher.name not in self.binary_files:
+          with open(dispatcher, 'r') as f:
+            lines = f.readlines()
+          with open(dispatcher, 'w') as f:
+            for line in lines:
+              if original in line:
+                line = patched
+              f.write(line)
 
     # summary
     print()
@@ -249,20 +271,6 @@ class CondaWheelConverter():
 def create_wheel(prefix_path):
   converter = CondaWheelConverter()
   result = converter.copy_files(prefix_path)
-
-  # fix macOS dispatchers to remove python.app
-  if sys.platform == 'darwin':
-    original = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/python.app/Contents/MacOS/$LIBTBX_PYEXE_BASENAME"'
-    patched = 'LIBTBX_PYEXE="$LIBTBX_PREFIX/bin/$LIBTBX_PYEXE_BASENAME"\n'
-    for dispatcher in converter.bin_path.iterdir():
-      if dispatcher.name not in converter.binary_files:
-        with open(dispatcher, 'r') as f:
-          lines = f.readlines()
-        with open(dispatcher, 'w') as f:
-          for line in lines:
-            if original in line:
-              line = patched
-            f.write(line)
 
   return result
 
