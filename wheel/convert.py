@@ -1,4 +1,5 @@
 import argparse
+import glob
 import json
 import os
 import shutil
@@ -32,6 +33,9 @@ class CondaWheelConverter():
       'cctbx.lattice_symmetry',
       'cctbx.find_distances',
       ]
+
+    # binary files in share that are used for testing
+    self.shared_binary_files = []
 
     # for self.fix_rpaths
     self.fixed_dylib = []
@@ -73,6 +77,22 @@ class CondaWheelConverter():
 
     assert n_copied == len(self.bin_files) + len(self.lib_files) + len(self.src_files)
 
+    # find binary files in shared
+    shared_binary_files = []
+    core_path = str(self.core_path.resolve())
+    shared_binary_files.extend(glob.glob(os.path.join(core_path, '**/tst*'), recursive=True))
+    shared_binary_files.extend(glob.glob(os.path.join(core_path, '**/*test*'), recursive=True))
+    shared_binary_files.extend(glob.glob(os.path.join(core_path, '**/driver?'), recursive=True))
+    shared_binary_files.extend(glob.glob(os.path.join(core_path, 'fftpack_timer'), recursive=True))
+    shared_binary_files.extend(glob.glob(os.path.join(core_path, 'hybrid_36_fem'), recursive=True))
+    shared_binary_files.extend(glob.glob(os.path.join(core_path, 'time_trigonometry'), recursive=True))
+
+    for binary in shared_binary_files:
+      if not os.path.isdir(binary):
+        self.shared_binary_files.append(binary)
+
+    print(self.shared_binary_files)
+
     # fix rpaths on macOS
     if sys.platform == 'darwin':
       for extension in self.lib_files:
@@ -81,6 +101,8 @@ class CondaWheelConverter():
       for binary in self.bin_files:
         if binary.name in self.binary_files:
           self.fix_rpaths(binary.name)
+      for binary in self.shared_binary_files:
+        self.fix_rpaths(binary)
 
     # summary
     print()
@@ -180,6 +202,8 @@ class CondaWheelConverter():
     assert new_rpath is not None, 'The conda environment must be active.'
     new_rpath = Path(new_rpath) / 'lib'
 
+    if os.path.isabs(filename):
+      file_path = filename
     if filename.endswith('dylib'):
       file_path = new_rpath / filename
     else:
@@ -199,7 +223,7 @@ class CondaWheelConverter():
       if line.strip().startswith('@rpath'):
         rpath_line = line.split()[0]
         library = rpath_line.split('/')[-1]
-        if library == filename:
+        if library == filename or library == filename.split('/')[-1]:
           continue
         new_lib = new_rpath / library
         assert new_lib.exists(), new_lib

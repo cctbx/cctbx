@@ -81,7 +81,7 @@ jobs:
 
           if [[ "`uname`" == "Darwin" ]]; then
             conda install -y delocate
-            delocate-wheel -w fixed_wheels -v ./wheels/cctbx?base*.whl -e libtbx/core/share/cctbx
+            DYLD_LIBRARY_PATH=${CONDA_PREFIX}/lib delocate-wheel -w fixed_wheels -v ./wheels/cctbx?base*.whl
             ls fixed_wheels
           else
             conda install -y auditwheel
@@ -192,7 +192,7 @@ jobs:
         run: |
           mkdir test
           cd test
-          libtbx.run_tests_parallel module=cctbx module=libtbx nproc=4
+          libtbx.run_tests_parallel module=cctbx module=libtbx module=scitbx module=smtbx nproc=4
 
       - name: Test (Windows)
         if: runner.os == 'Windows'
