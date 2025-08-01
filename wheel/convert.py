@@ -257,7 +257,8 @@ def run_command():
       if 'Library' in relative_path.parent.parts:
         library_path = Path(os.fspath(file_path).split('Library')[-1][1:])
         library_parts = library_path.parent.parts[0]
-        if 'bin' in library_parts and not library_path.name.endswith('.exe'):
+        if ('bin' in library_parts and not library_path.name.endswith('.exe')) \
+          or (library_path.name[:-4]) in self.binary_files:
           dest = self.entry_point_path / library_path.name
           self.bin_files.append(dest)
         elif 'share' in library_parts \
@@ -273,9 +274,6 @@ def run_command():
           or 'egg-info' in os.fspath(library_path.parent) \
           or 'dist-info' in os.fspath(library_path.parent):
           pass
-        elif file_path.name in self.binary_files:
-          dest = (self.entry_point_path / file_path.name)
-          self.bin_files.append(dest)
         elif 'site-packages' in relative_path.parent.parts:
           dest = (self.src_path / Path(os.fspath(file_path).split('site-packages')[-1][1:])).resolve()
           self.src_files.append(dest)
