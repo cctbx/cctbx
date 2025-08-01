@@ -217,3 +217,35 @@ jobs:
           REM libtbx.python --version
           REM libtbx.run_tests_parallel module=cctbx module=libtbx module=scitbx module=smtbx nproc=4
           python -c "from scitbx.array_family import flex; d = flex.random_double(500); print(flex.mean(d))"
+
+  publish-to-testpypi:
+    if: ${{ github.repository == 'cctbx/cctbx' && github.ref_name == 'master' }}
+    name: Publish Python 🐍 distribution 📦 to TestPyPI
+    needs: test_pip_packages
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testing
+      url: https://test.pypi.org/p/cctbx-base
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        path: wheels/
+
+    - name: Move wheels to dist
+      run: |
+        mkdir dist
+        ls
+        ls wheels/*
+        mv wheels/*/*.whl ./dist
+        ls dist
+
+    - name: Publish distribution 📦 to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
