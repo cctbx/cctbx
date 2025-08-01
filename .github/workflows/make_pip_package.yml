@@ -12,8 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         channel: [cctbx-nightly]
-        # os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
-        os: [windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
         python_version: [3.9, "3.10", 3.11, 3.12, 3.13]
 
     name: Converting (${{ matrix.channel }}, ${{ matrix.os }}, Python ${{ matrix.python_version }})
@@ -164,8 +163,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
-        os: [windows-latest]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
         python_version: [3.9, "3.10", 3.11, 3.12, 3.13]
 
     name: Testing (${{ matrix.os }}, Python ${{ matrix.python_version }})
