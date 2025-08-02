@@ -62,11 +62,9 @@ from pathlib import Path
 def run_command():
   import libtbx.core.dispatchers
   executable = Path(libtbx.core.dispatchers.__file__).parent / '{dispatcher_name}'
+  executable = str(executable.resolve())
 
-  if sys.platform == 'win32':
-    raise SystemExit(subprocess.call([executable, *sys.argv[1:]], close_fds=False))
-  else:
-    os.execl(executable, *sys.argv[1:])
+  sys.exit(subprocess.call([executable, *sys.argv[1:]], shell=False))
 '''
 
   # ---------------------------------------------------------------------------
@@ -167,8 +165,8 @@ def run_command():
                 line = '@set LIBTBX_PYEXE=python.exe'
               # simplify batch file path
               elif r'@"%LIBTBX_PYEXE%" "%LIBTBX_PREFIX%\..\lib\site-packages' in line:
-                python_file = line.split('site-packages')[-1]
-                line = r'@"%LIBTBX_PYEXE%" "%~dp0\..\..\..{python_file}" %*'.format(python_file=python_file)
+                python_file = line.split('site-packages')[-1].strip()
+                line = r'@"%LIBTBX_PYEXE%" "%~dp0\..\..\..{python_file}"'.format(python_file=python_file)
               # do not change PATH
               elif 'PATH=' in line:
                 continue
@@ -232,7 +230,8 @@ def run_command():
     # ignore existing .egg-info and .dist-info directories
     if '__pycache__' in relative_path.parent.parts \
       or 'egg-info' in os.fspath(relative_path.parent) \
-      or 'dist-info' in os.fspath(relative_path.parent):
+      or 'dist-info' in os.fspath(relative_path.parent) \
+      or 'libtbx.pythonw' in relative_path.name:
       pass
     elif file_path.name in self.binary_files:
       dest = (self.entry_point_path / file_path.name)

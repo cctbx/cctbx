@@ -189,14 +189,15 @@ jobs:
             pip install -vvv %%f
           )
 
-      - name: Test (Linux & macOS)
+      - name: Debug (Linux & macOS)
         if: runner.os != 'Windows'
         run: |
-          mkdir test
-          cd test
-          libtbx.run_tests_parallel module=cctbx module=libtbx module=scitbx module=smtbx nproc=4
+          dispatchers_dir=`python -c "import libtbx.core.dispatchers; from pathlib import Path; print(Path(libtbx.core.dispatchers.__file__).parent)"`
+          ls $dispatchers_dir
+          more $dispatchers_dir/cctbx_lattice_symmetry.py
+          libtbx.python --version
 
-      - name: Test (Windows)
+      - name: Debug (Windows)
         if: runner.os == 'Windows'
         shell: cmd
         run: |
@@ -207,16 +208,56 @@ jobs:
           more %sp_dir%\libtbx\core\dispatchers\libtbx_run_tests_parallel.py
           more %sp_dir%\libtbx\core\dispatchers\libtbx.python.bat
           more %sp_dir%\libtbx\core\dispatchers\libtbx_python.py
+          more %sp_dir%\libtbx\core\dispatchers\iotbx.fetch_pdb.bat
+          more %sp_dir%\libtbx\core\dispatchers\iotbx_fetch_pdb.py
           python -c "from importlib.metadata import entry_points; eps = entry_points(); cs = eps['console_scripts']; print(cs)"
           python -c "import sysconfig; print(sysconfig.get_path('scripts'))" > script_dir.txt
           set /p script_dir=<".\script_dir.txt"
           dir %script_dir%
 
+          REM Windows does not create *.python.exe console scripts for some reason
+          REM *.exe are created instead
+          REM hack to enable testing
+          libtbx --version
+          move %script_dir%\libtbx.exe %script_dir%\libtbx.python.exe
+          libtbx.python --version
+
+          libtbx.raise_exception_for_testing
+          python -c "import os; import libtbx.load_env; d = libtbx.env.under_dist(module_name='scitbx', path='lbfgs/tst_lbfgs_fem.py'); print(d, os.path.isfile(d))"
+
+      - name: Test dispatcher
+        run: iotbx.fetch_pdb
+
+      - name: Test binary entry point
+        run: cctbx.find_distances
+
+      - name: Test (Linux & macOS)
+        if: runner.os != 'Windows'
+        run: |
           mkdir test
           cd test
-          REM libtbx.python --version
-          REM libtbx.run_tests_parallel module=cctbx module=libtbx module=scitbx module=smtbx nproc=4
-          python -c "from scitbx.array_family import flex; d = flex.random_double(500); print(flex.mean(d))"
+          libtbx.run_tests_parallel \
+            module=cctbx \
+            module=libtbx \
+            module=scitbx \
+            module=smtbx \
+            nproc=4
+
+      - name: Test (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          mkdir test
+          cd test
+          libtbx.run_tests_parallel ^
+            module=cctbx ^
+            nproc=4
+          REM libtbx.run_tests_parallel ^
+          REM   module=cctbx ^
+          REM   module=libtbx ^
+          REM   module=scitbx ^
+          REM   module=smtbx ^
+          REM   nproc=4
 
   publish-to-testpypi:
     if: ${{ github.repository == 'cctbx/cctbx' && github.ref_name == 'master' }}
