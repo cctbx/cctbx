@@ -97,6 +97,10 @@ jobs:
 
       git commit -am "Update for v$(version)"
       git push -f -u origin nightly
+
+      git checkout release
+      git reset --hard nightly
+      git push -f -u origin release
     displayName: Update sources
     continueOnError: true
 

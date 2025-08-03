@@ -4,6 +4,7 @@ trigger:
   branches:
     exclude:
       - nightly
+      - release
 
 jobs:
 - job: Build_cctbx_source_tarball
