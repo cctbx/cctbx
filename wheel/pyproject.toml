@@ -14,7 +14,6 @@ authors = [{name = "CCTBX developers"}]
 maintainers = [{name = "CCTBX developers", email="cctbx@cci.lbl.gov"}]
 
 requires-python = ">=3.9"
-readme = "README.md"
 
 classifiers = [
   'Development Status :: 5 - Production/Stable',
