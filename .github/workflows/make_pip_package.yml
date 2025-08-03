@@ -11,11 +11,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        channel: [cctbx-nightly]
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-15, macos-13, windows-latest]
         python_version: [3.9, "3.10", 3.11, 3.12, 3.13]
 
-    name: Converting (${{ matrix.channel }}, ${{ matrix.os }}, Python ${{ matrix.python_version }})
+    name: Converting (${{ matrix.os }}, Python ${{ matrix.python_version }})
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -33,9 +32,15 @@ jobs:
           conda info
           conda list
 
-      - name: Install cctbx
+      - name: Install cctbx (cctbx-nightly)
+        if: ${{ github.ref_name != 'release' }}
         run: |
-          conda install -n test -c ${{ matrix.channel }} -y cctbx-base python=${{ matrix.python_version }}
+          conda install -n test -c cctbx-nightly -y cctbx-base python=${{ matrix.python_version }}
+
+      - name: Install cctbx (conda-forge)
+        if: github.ref_name == 'release'
+        run: |
+          conda install -n test -c conda-forge -y cctbx-base python=${{ matrix.python_version }}
 
       - name: Test environment info
         run: |
@@ -290,3 +295,36 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         repository-url: https://test.pypi.org/legacy/
+        skip-existing: true
+
+  publish-to-pypi:
+    if: ${{ github.repository == 'cctbx/cctbx' && github.ref_name == 'release' }}
+    name: Publish Python 🐍 distribution 📦 to PyPI
+    needs: test_pip_packages
+    runs-on: ubuntu-latest
+
+    environment:
+      name: release
+      url: https://pypi.org/p/cctbx-base
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        path: wheels/
+
+    - name: Move wheels to dist
+      run: |
+        mkdir dist
+        ls
+        ls wheels/*
+        mv wheels/*/*.whl ./dist
+        ls dist
+
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        skip-existing: true
