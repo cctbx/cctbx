@@ -165,8 +165,8 @@ def run_command():
                 line = '@set LIBTBX_PYEXE=python.exe'
               # simplify batch file path
               elif r'@"%LIBTBX_PYEXE%" "%LIBTBX_PREFIX%\..\lib\site-packages' in line:
-                python_file = line.split('site-packages')[-1].strip()
-                line = r'@"%LIBTBX_PYEXE%" "%~dp0\..\..\..{python_file}"'.format(python_file=python_file)
+                python_file = line.split('site-packages')[-1].split()[0].strip().strip('"')
+                line = r'@"%LIBTBX_PYEXE%" "%~dp0\..\..\..{python_file}" %*'.format(python_file=python_file)
               # do not change PATH
               elif 'PATH=' in line:
                 continue
