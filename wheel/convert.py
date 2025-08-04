@@ -231,7 +231,7 @@ def run_command():
     if '__pycache__' in relative_path.parent.parts \
       or 'egg-info' in os.fspath(relative_path.parent) \
       or 'dist-info' in os.fspath(relative_path.parent) \
-      or 'libtbx.pythonw' in relative_path.name:
+      or '.pythonw.' in relative_path.name:
       pass
     elif file_path.name in self.binary_files:
       dest = (self.entry_point_path / file_path.name)

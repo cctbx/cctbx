@@ -225,10 +225,8 @@ jobs:
           REM hack to enable testing
           libtbx --version
           move %script_dir%\libtbx.exe %script_dir%\libtbx.python.exe
+          move %script_dir%\scitbx.exe %script_dir%\scitbx.python.exe
           libtbx.python --version
-
-          libtbx.raise_exception_for_testing
-          python -c "import os; import libtbx.load_env; d = libtbx.env.under_dist(module_name='scitbx', path='lbfgs/tst_lbfgs_fem.py'); print(d, os.path.isfile(d))"
 
       - name: Test dispatcher
         run: iotbx.fetch_pdb
@@ -256,13 +254,10 @@ jobs:
           cd test
           libtbx.run_tests_parallel ^
             module=cctbx ^
+            module=libtbx ^
+            module=scitbx ^
+            module=smtbx ^
             nproc=4
-          REM libtbx.run_tests_parallel ^
-          REM   module=cctbx ^
-          REM   module=libtbx ^
-          REM   module=scitbx ^
-          REM   module=smtbx ^
-          REM   nproc=4
 
   publish-to-testpypi:
     if: ${{ github.repository == 'cctbx/cctbx' && github.ref_name == 'master' }}
