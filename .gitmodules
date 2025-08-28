@@ -37,3 +37,6 @@
 [submodule "modules/dxtbx"]
 	path = modules/dxtbx
 	url = https://github.com/dials/dxtbx.git
+[submodule "modules/ncdist"]
+	path = modules/ncdist
+	url = https://github.com/yayahjb/ncdist.git
