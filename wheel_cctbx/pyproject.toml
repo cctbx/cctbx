@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "cctbx"
+version = "REPLACEME"
+dependencies = ["cctbx-base==REPLACEME", "ipython", "wxpython"]
+license = "BSD-3-Clause-LBNL AND BSD-3-Clause AND BSL-1.0 AND LGPL-2.0-only AND LGPL-2.1-only AND LGPL-3.0-only AND MIT AND LGPL-2.0-or-later WITH WxWindows-exception-3.1"
+license-files = ["../modules/cctbx_project/LICEN[CS]E*.txt"]
+
+description = "The Computational Crystallography Toolbox (cctbx)"
+readme = "../wheel/README.md"
+authors = [{name = "CCTBX developers"}]
+maintainers = [{name = "CCTBX developers", email="cctbx@cci.lbl.gov"}]
+
+requires-python = ">=3.9"
+
+classifiers = [
+  'Development Status :: 5 - Production/Stable',
+  'Intended Audience :: Science/Research',
+  'Intended Audience :: Developers',
+  'Programming Language :: C++',
+  'Programming Language :: Python',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.9',
+  'Programming Language :: Python :: 3.10',
+  'Programming Language :: Python :: 3.11',
+  'Programming Language :: Python :: 3.12',
+  'Programming Language :: Python :: 3.13',
+  'Programming Language :: Python :: 3 :: Only',
+  'Programming Language :: Python :: Implementation :: CPython',
+  'Topic :: Software Development',
+  'Topic :: Scientific/Engineering',
+  'Operating System :: Microsoft :: Windows',
+  'Operating System :: POSIX',
+  'Operating System :: Unix',
+  'Operating System :: MacOS',
+]
+
+[project.urls]
+homepage = "https://github.com/cctbx/cctbx_project"
+documentation = "https://cci.lbl.gov/docs/cctbx"
+source = "https://github.com/cctbx/cctbx_project"
+download = "https://github.com/cctbx/cctbx_project/releases"
+tracker = "https://github.com/cctbx/cctbx_project/issues"
+"release notes" = "https://github.com/cctbx/cctbx_project/releases"
+
+[tool.setuptools.packages.find]
+exclude = ["*"]

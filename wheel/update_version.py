@@ -10,9 +10,11 @@ def update_version(filename, version):
 
   with open(filename, 'w') as f:
     for line in lines:
+      line = line.rstrip()
       if 'REPLACEME' in line:
-        line = f'version = "{version}"\n'
+        line = line.replace('REPLACEME', version)
       f.write(line)
+      f.write('\n')
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description=__doc__)
