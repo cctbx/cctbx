@@ -260,7 +260,7 @@ jobs:
             nproc=4
 
   publish-to-testpypi:
-    if: ${{ github.repository == 'cctbx/cctbx' && github.ref_name == 'ci' }}
+    if: ${{ github.repository == 'cctbx/cctbx' && github.ref_name == 'master' }}
     name: Publish Python 🐍 distribution 📦 to TestPyPI
     needs: test_pip_packages
     runs-on: ubuntu-latest
