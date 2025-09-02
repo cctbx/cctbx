@@ -6,10 +6,10 @@ name = "cctbx"
 version = "REPLACEME"
 dependencies = ["cctbx-base==REPLACEME", "ipython", "wxpython"]
 license = "BSD-3-Clause-LBNL AND BSD-3-Clause AND BSL-1.0 AND LGPL-2.0-only AND LGPL-2.1-only AND LGPL-3.0-only AND MIT AND LGPL-2.0-or-later WITH WxWindows-exception-3.1"
-license-files = ["../modules/cctbx_project/LICEN[CS]E*.txt"]
+license-files = ["LICEN[CS]E*.txt"]
 
 description = "The Computational Crystallography Toolbox (cctbx)"
-readme = "../wheel/README.md"
+readme = "README.md"
 authors = [{name = "CCTBX developers"}]
 maintainers = [{name = "CCTBX developers", email="cctbx@cci.lbl.gov"}]
 
