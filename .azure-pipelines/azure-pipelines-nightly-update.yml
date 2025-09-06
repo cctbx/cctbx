@@ -81,7 +81,8 @@ jobs:
       for module in cbflib; do
         cd ${module}
         git checkout main
-        git pull --rebase
+        # git pull --rebase
+        git checkout a9f39aff00580bb24d6dacb9ffa1bd2df1dedc31
         cd ..
       done
 
