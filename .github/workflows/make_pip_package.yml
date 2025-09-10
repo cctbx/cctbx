@@ -93,7 +93,7 @@ jobs:
           else
             conda install -y auditwheel
             export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
-            auditwheel repair -w fixed_wheels ./wheels/cctbx?base*.whl
+            auditwheel repair -w fixed_wheels --plat manylinux_2_17_x86_64 ./wheels/cctbx?base*.whl
             ls fixed_wheels
           fi
 
