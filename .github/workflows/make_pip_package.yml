@@ -33,12 +33,22 @@ jobs:
           conda list
 
       - name: Install cctbx (cctbx-nightly)
-        if: ${{ github.ref_name != 'release' }}
+        if: github.ref_name != 'release' && runner.os == 'Linux'
+        run: |
+          CONDA_OVERRIDE_GLIBC=2.17 conda install -n test -c cctbx-nightly -y cctbx-base python=${{ matrix.python_version }} sysroot_linux-64=2.17
+
+      - name: Install cctbx (cctbx-nightly)
+        if: github.ref_name != 'release' && runner.os != 'Linux'
         run: |
           conda install -n test -c cctbx-nightly -y cctbx-base python=${{ matrix.python_version }}
 
       - name: Install cctbx (conda-forge)
-        if: github.ref_name == 'release'
+        if: github.ref_name == 'release' && runner.os == 'Linux'
+        run: |
+          CONDA_OVERRIDE_GLIBC=2.17 conda install -n test -c conda-forge -y cctbx-base python=${{ matrix.python_version }} sysroot_linux-64=2.17
+
+      - name: Install cctbx (conda-forge)
+        if: github.ref_name == 'release' && runner.os != 'Linux'
         run: |
           conda install -n test -c conda-forge -y cctbx-base python=${{ matrix.python_version }}
 
