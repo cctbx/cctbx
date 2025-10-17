@@ -223,7 +223,7 @@ jobs:
       - name: Install cctbx (cctbx-nightly)
         if: ${{ github.ref_name != 'release' }}
         run: |
-          conda install -n test -c cctbx-nightly -y cctbx-base python=${{ matrix.python_version }}
+          conda install -n test -c cctbx-nightly -y cctbx-base python=${{ matrix.python_version }} libstdcxx=14 libgcc=14 libgfortran=14
 
       - name: Install cctbx (conda-forge)
         if: github.ref_name == 'release'
@@ -279,8 +279,9 @@ jobs:
             DYLD_LIBRARY_PATH=${CONDA_PREFIX}/lib delocate-wheel -w fixed_wheels -v ./wheels/cctbx?base*.whl
             ls fixed_wheels
           else
-            pip install auditwheel
-            # conda install -y auditwheel
+            conda install -y auditwheel
+            AUDITWHEEL_DIR=`python -c "import auditwheel; from pathlib import Path; print(Path(auditwheel.__file__).parent)"`
+            cp ./manylinux-policy.json ${AUDITWHEEL_DIR}/policy/manylinux-policy.json
             export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib
             auditwheel -v repair -w fixed_wheels ./wheels/cctbx?base*.whl
             ls fixed_wheels
