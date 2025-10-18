@@ -227,15 +227,26 @@ jobs:
 
     steps:
       - uses: actions/setup-python@v5
+        if: runner.os != 'Linux'
         with:
           python-version: ${{ matrix.python_version }}
+
+      - name: Create virtualenv on Linux
+        if: runner.os == 'Linux'
+        run: python${{ matrix.python_version }} -m venv new
 
       - uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.os }}_${{ matrix.python_version }}
 
-      - name: Install pip package (Linux & macOS)
-        if: runner.os != 'Windows'
+      - name: Install pip package (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          source new/bin/activate
+          pip install -vvv cctbx*.whl
+
+      - name: Install pip package (macOS)
+        if: runner.os == 'macOS'
         run: pip install -vvv cctbx*.whl
 
       - name: Install pip package (Windows)
@@ -246,8 +257,8 @@ jobs:
             pip install -vvv %%f
           )
 
-      - name: Debug (Linux & macOS)
-        if: runner.os != 'Windows'
+      - name: Debug (macOS)
+        if: runner.os == 'macOS'
         run: |
           dispatchers_dir=`python -c "import libtbx.core.dispatchers; from pathlib import Path; print(Path(libtbx.core.dispatchers.__file__).parent)"`
           ls $dispatchers_dir
@@ -281,13 +292,30 @@ jobs:
           libtbx.python --version
 
       - name: Test dispatcher
+        if: runner.os != 'Linux'
         run: iotbx.fetch_pdb
 
       - name: Test binary entry point
+        if: runner.os != 'Linux'
         run: cctbx.find_distances
 
-      - name: Test (Linux & macOS)
-        if: runner.os != 'Windows'
+      - name: Test (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          source new/bin/activate
+          iotbx.fetch_pdb
+          cctbx.find_distances
+          mkdir test
+          cd test
+          libtbx.run_tests_parallel \
+            module=cctbx \
+            module=libtbx \
+            module=scitbx \
+            module=smtbx \
+            nproc=4
+
+      - name: Test (macOS)
+        if: runner.os == 'macOS'
         run: |
           mkdir test
           cd test
