@@ -224,7 +224,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     container:
       image: ${{ matrix.image }}
-      options: --user 1000:1000
 
     steps:
       - uses: actions/setup-python@v5
@@ -235,14 +234,10 @@ jobs:
       - name: Create virtualenv on Linux
         if: runner.os == 'Linux'
         run: |
+          yum install -y sudo
+          useradd tester
           cd /tmp
-          python${{ matrix.python_version }} -m venv new
-
-      - uses: actions/download-artifact@v4
-        if: runner.os == 'Linux'
-        with:
-          name: ${{ matrix.os }}_${{ matrix.python_version }}
-          path: /tmp
+          sudo -u tester python${{ matrix.python_version }} -m venv new
 
       - uses: actions/download-artifact@v4
         with:
@@ -252,7 +247,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           source /tmp/new/bin/activate
-          pip install -vvv /tmp/cctbx*.whl
+          sudo -u tester  pip install -vvv cctbx*.whl
 
       - name: Install pip package (macOS)
         if: runner.os == 'macOS'
@@ -315,9 +310,9 @@ jobs:
           source /tmp/new/bin/activate
           iotbx.fetch_pdb
           cctbx.find_distances
-          mkdir test
+          sudo -u tester mkdir -p test
           cd test
-          libtbx.run_tests_parallel \
+          sudo -u tester libtbx.run_tests_parallel \
             module=cctbx \
             module=libtbx \
             module=scitbx \
