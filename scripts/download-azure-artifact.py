@@ -6,6 +6,8 @@ import shutil
 import sys
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # =============================================================================
 # def construct_url(organization, pipelineId, project, run_id, api_version, artifactName):
@@ -28,8 +30,18 @@ def get_run_id(organization, project, definitions, api_version):
 # =============================================================================
 # https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
 # modified to use a specific filename
-def download_file(url, local_filename):
-  with requests.get(url, stream=True) as r:
+def download_file(url, local_filename, max_retries=5):
+  retry_strategy = Retry(
+    total=max_retries,
+    backoff_factor=1,
+    status_forcelist=[429, 500, 502, 503, 504],
+  )
+  adapter = HTTPAdapter(max_retries=retry_strategy)
+  session = requests.Session()
+  session.mount('https://', adapter)
+  session.mount('http://', adapter)
+  with session.get(url, stream=True) as r:
+    r.raise_for_status()
     with open(local_filename, 'wb') as f:
       shutil.copyfileobj(r.raw, f)
 
