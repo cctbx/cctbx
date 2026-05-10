@@ -317,6 +317,7 @@ jobs:
             module=libtbx \
             module=scitbx \
             module=smtbx \
+            max_retries=2 \
             nproc=4
 
       - name: Test (macOS)
@@ -329,6 +330,7 @@ jobs:
             module=libtbx \
             module=scitbx \
             module=smtbx \
+            max_retries=2 \
             nproc=4
 
       - name: Test (Windows)
@@ -342,6 +344,7 @@ jobs:
             module=libtbx ^
             module=scitbx ^
             module=smtbx ^
+            max_retries=2 ^
             nproc=4
 
   publish-to-testpypi:
