@@ -105,7 +105,7 @@ jobs:
       conda create -n smithy -c conda-forge -y conda-smithy
       source activate smithy
 
-      conda smithy rerender -c auto
+      conda-smithy rerender -c auto
 
       git remote set-url origin git@github.com:cctbx/nightly-feedstock.git
 
