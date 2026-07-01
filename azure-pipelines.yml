@@ -111,7 +111,6 @@ jobs:
       python bootstrap.py base build \
         --builder=cctbx \
         --use-conda \
-        --python 39 \
         --config-flags="--cxxstd=c++14" \
         --nproc=4
       cd build
