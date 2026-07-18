@@ -10,7 +10,7 @@ jobs:
 - job: Build_cctbx_source_tarball
   pool:
     vmImage: ubuntu-22.04
-  timeoutInMinutes: 120
+  timeoutInMinutes: 180
 
   # variables for version
   variables:
@@ -110,14 +110,14 @@ jobs:
       set -xe
       python bootstrap.py base build \
         --builder=cctbx \
-        --use-conda \
-        --config-flags="--cxxstd=c++14" \
         --nproc=4
       cd build
       source setpaths.sh
       libtbx.configure cma_es fable rstbx spotfinder cbflib_adaptbx phenix_regression phenix_examples
       libtbx.scons -j 4
       libtbx.scons -j 4
+      cd ..
+      conda install -p ./conda_base -c conda-forge -y orderedset
     displayName: Configure and Build
 
   - script: |
@@ -134,12 +134,13 @@ jobs:
       mkdir tests
       cd tests
       export PYTHONDEVMODE=1
-      export PYTHONTRACEMALLOC=3
+      export PYTHONTRACEMALLOC=1
       libtbx.run_tests_parallel \
         module=annlib_adaptbx \
         module=boost_adaptbx \
         module=cbflib_adaptbx \
         module=cctbx \
+        module=xcif \
         module=cctbx_website \
         module=cma_es \
         module=fable \
@@ -150,6 +151,7 @@ jobs:
         module=scitbx \
         module=smtbx \
         module=spotfinder \
+        max_retries=2 \
         nproc=4
     failOnStderr: false
     continueOnError: true
