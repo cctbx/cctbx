@@ -38,7 +38,8 @@ jobs:
         with:
           activate-environment: test
           auto-update-conda: true
-          miniforge-version: latest
+          # Pin on Windows until conda-forge/miniforge#913 is fixed
+          miniforge-version: ${{ runner.os == 'Windows' && '26.7.2-1' || 'latest' }}
           python-version: ${{ matrix.python_version }}
 
       - name: Base environment info
