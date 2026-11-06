@@ -75,14 +75,14 @@ jobs:
   - checkout: nightly_feedstock
     persistCredentials: true
 
-  # add conda to path
-  # https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/anaconda?view=azure-devops&tabs=ubuntu-16-04#add-conda-to-your-system-path
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
-    displayName: Add conda to PATH
-
-  # accept conda tos
-  - script: conda config --set plugins.auto_accept_tos yes
-    displayName: Accept conda TOS
+  # install miniforge (ubuntu-latest no longer provides conda)
+  - script: |
+      set -xe
+      cd $(Pipeline.Workspace)
+      wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+      bash Miniforge3-Linux-x86_64.sh -b -u -p $(Pipeline.Workspace)/miniforge
+      echo "##vso[task.prependpath]$(Pipeline.Workspace)/miniforge/bin"
+    displayName: Install miniforge
 
   # update cctbx/nightly-feedstock to trigger conda package builds
   - script: |
