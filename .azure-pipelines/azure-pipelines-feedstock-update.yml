@@ -93,12 +93,17 @@ jobs:
 
       git checkout main
 
+      # recipe.yaml is the v1 (rattler-build) recipe; meta.yaml the older format
+      recipe=./recipe/recipe.yaml
+      if [ ! -f ${recipe} ]; then
+        recipe=./recipe/meta.yaml
+      fi
       python ./recipe/update_meta.py \
         --organization cctbx-release \
         --project $(System.TeamProject) \
         --runId $(resources.pipeline.source_tarball.runID) \
         --new-version $(version) \
-        --meta-path ./recipe/meta.yaml
+        --meta-path ${recipe}
 
       git commit -am "Update for v$(version)"
 
