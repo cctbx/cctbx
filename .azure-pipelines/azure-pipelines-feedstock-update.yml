@@ -76,8 +76,10 @@ jobs:
     persistCredentials: true
 
   # install miniforge (ubuntu-latest no longer provides conda)
+  # no -x: the agent would also run the traced ##vso command, adding a
+  # PATH entry ending in ' that breaks conda activation
   - script: |
-      set -xe
+      set -e
       cd $(Pipeline.Workspace)
       wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
       bash Miniforge3-Linux-x86_64.sh -b -u -p $(Pipeline.Workspace)/miniforge
